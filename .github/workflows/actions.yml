@@ -31,8 +31,9 @@ jobs:
       run: |
         bandit -lll */*.py *c/*/*.py
     - name: Run safety checks
-      run: |
-        safety check -r ./requirements.txt
+      uses: pyupio/safety-action@v1
+      with:
+        api-key: ${{ secrets.SAFETY_API_KEY }}
     - name: Check files using the black formatter
       uses: rickstaa/action-black@v1
       id: action_black
