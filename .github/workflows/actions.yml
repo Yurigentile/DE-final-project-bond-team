@@ -29,10 +29,10 @@ jobs:
         pytest
     - name: Run bandit checks
       run: |
-        bandit
+        bandit -lll */*.py *c/*/*.py
     - name: Run safety checks
       run: |
-        safety
+        safety check -r ./requirements.txt
     - name: Check files using the black formatter
       uses: rickstaa/action-black@v1
       id: action_black
