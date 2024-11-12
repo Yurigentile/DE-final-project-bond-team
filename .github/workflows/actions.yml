@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: eu-west-2
+      AWS_DEFAULT_REGION: eu-west-2
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
