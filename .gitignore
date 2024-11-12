@@ -2,3 +2,5 @@ venv
 .env
 **/.terraform*
 *.tfstate*
+*__pycache__
+*.pytest_cache
