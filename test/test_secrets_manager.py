@@ -7,7 +7,7 @@ from src.secrets_manager import get_secret
 
 @mock_aws
 def test_get_secret_find_secret():
-  client = boto3.client('secretsmanager', region_name='eu-west-2')
+  client = boto3.client('secretsmanager')
 
   secret_name = "source_rds_credentials"
   secret_value = {
@@ -25,7 +25,7 @@ def test_get_secret_find_secret():
 
 @mock_aws
 def test_get_secret_miss_secret():
-  client = boto3.client('secretsmanager', region_name='eu-west-2')
+  client = boto3.client('secretsmanager')
 
   secret_name = "source_rds_credentials"
   secret_value = {
