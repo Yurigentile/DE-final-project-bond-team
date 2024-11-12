@@ -1,7 +1,7 @@
 from moto import mock_aws
+import boto3
 import pytest
 import json
-import boto3
 from botocore.exceptions import ClientError
 from src.secrets_manager import get_secret
 
