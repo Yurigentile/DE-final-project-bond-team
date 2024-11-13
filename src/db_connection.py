@@ -37,3 +37,15 @@ def create_conn(sm_params):
 
     except Exception as e:
         print(f" Something went wrong: {e}")
+
+def close_conn(conn):
+    """
+    Closes a database connection
+    
+    Parameters:
+        conn (pg8000 connection object): a pg8000 connection to a database
+
+    Returns:
+        Nothing
+    """
+    conn.close()
