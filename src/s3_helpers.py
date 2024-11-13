@@ -39,7 +39,7 @@ def retrieve_list_of_s3_files(bucket):
               contains no files.
 
     Example:
-        >>> etrieve_list_of_s3_files('my-bucket')
+        >>> retrieve_list_of_s3_files('my-bucket')
         ['file1.json', 'file2.json', 'file3.json']
 
     Raises:
