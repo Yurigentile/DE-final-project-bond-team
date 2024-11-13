@@ -1,5 +1,4 @@
 from pg8000.native import Connection
-from src.secrets_manager import get_secret
 import json
 
 
