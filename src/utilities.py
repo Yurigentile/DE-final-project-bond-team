@@ -4,7 +4,8 @@ import os
 import tempfile
 import csv
 
-s3_client = boto3.client('s3', region_name = 'eu-west-2')
+s3_client = boto3.client("s3", region_name="eu-west-2")
+
 
 def s3_save_as_json(data, bucket, key):
     """
@@ -31,21 +32,22 @@ def s3_save_as_json(data, bucket, key):
     >>> key = "path/to/object.json"
     >>> s3_save(data, bucket, key)
     Saved to my-s3-bucket/path/to/object.json
-    """   
+    """
     try:
         s3_client.put_object(
             Bucket=bucket,
             Key=key,
             Body=json.dumps(data),
-            ContentType='application/json'
+            ContentType="application/json",
         )
         print(f"Saved to {bucket}/{key}")
     except Exception as e:
         print(f"Error: {e}")
 
+
 def s3_save_as_csv(data, headers, bucket, key):
     """
-    Converts data to CSV, saves it to a temporary file, 
+    Converts data to CSV, saves it to a temporary file,
     and uploads it to S3.
 
     Parameters:
@@ -57,19 +59,14 @@ def s3_save_as_csv(data, headers, bucket, key):
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_file:
         temp_path = temp_file.name
-        
-        with open(temp_path, mode='w', newline='') as f:
-            csv_writer = csv.writer(f, lineterminator='\n')
+
+        with open(temp_path, mode="w", newline="") as f:
+            csv_writer = csv.writer(f, lineterminator="\n")
             csv_writer.writerow(headers)
             csv_writer.writerows(data)
 
     with open(temp_path, "rb") as f:
-        s3_client.put_object(
-            Bucket=bucket,
-            Key=key,
-            Body=f,
-            ContentType='text/csv'
-        )
+        s3_client.put_object(Bucket=bucket, Key=key, Body=f, ContentType="text/csv")
         print(f"Data saved to {bucket}/{key}")
 
-    os.remove(temp_path)        
+    os.remove(temp_path)
