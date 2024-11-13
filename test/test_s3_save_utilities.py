@@ -8,7 +8,6 @@ from src.utilities import s3_save_as_json, s3_save_as_csv
 
 @mock_aws
 class TestS3Save(unittest.TestCase):
-    
     @patch("builtins.print")
     def test_s3_save(self, mock_print):
         # Setup mock values to be passed from the lambda
@@ -36,7 +35,7 @@ class TestS3Save(unittest.TestCase):
         self.assertEqual(saved_data, data)
         self.assertEqual(response["ContentType"], "application/json")
         mock_print.assert_called_with(f"Saved to {bucket}/{key}")
-        
+
     def test_s3_save_error_handling(self):
         # Setup mock values to be passed from the lambda
         bucket = "testbucket"
@@ -69,7 +68,6 @@ class TestS3Save(unittest.TestCase):
 
 @mock_aws
 class TestS3SaveAsCSV(unittest.TestCase):
-
     def setUp(self):
         # Setup mock values to be passed from the lambda
         self.bucket = "test-bucket"
@@ -82,11 +80,11 @@ class TestS3SaveAsCSV(unittest.TestCase):
         self.s3_client = boto3.client("s3", region_name=self.region)
         self.s3_client.create_bucket(
             Bucket=self.bucket,
-            CreateBucketConfiguration={"LocationConstraint": self.region}
+            CreateBucketConfiguration={"LocationConstraint": self.region},
         )
 
     def test_s3_save_as_csv_success(self):
-        # Call the function 
+        # Call the function
         s3_save_as_csv(self.data, self.headers, self.bucket, self.key)
 
         # Verify contents of bucket
@@ -111,5 +109,3 @@ class TestS3SaveAsCSV(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
