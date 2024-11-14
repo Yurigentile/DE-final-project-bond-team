@@ -40,7 +40,6 @@ def get_latest_data(conn, tables, sync_timestamp):
             rows = conn.run(f"SELECT * FROM {identifier(table)} WHERE last_updated > :sync_timestamp", sync_timestamp=sync_timestamp)
             columns = [col["name"] for col in conn.columns]
             result[table] = [dict(zip(columns, row)) for row in rows] 
-        print(result)
         return result
     finally:
         conn.close()

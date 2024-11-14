@@ -23,7 +23,7 @@ def xtest_get_latest_data():
     sync_timestamp = '2024-11-14 08:30:00.000'
    
     result = get_latest_data(conn, tables, sync_timestamp)
-
+    
     assert isinstance(result, dict) # TODO: # Test query results on test database (filtered data by last update)
 
 def xtest_get_latest_data_returns_empty_tables_for_the_future_date():
