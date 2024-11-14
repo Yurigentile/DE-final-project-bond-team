@@ -3,7 +3,7 @@ from unittest.mock import patch
 import boto3
 from moto import mock_aws
 import json
-from s3_save_utilities import s3_save_as_json, s3_save_as_csv
+from src.s3_save_utilities import s3_save_as_json, s3_save_as_csv
 
 
 @mock_aws
