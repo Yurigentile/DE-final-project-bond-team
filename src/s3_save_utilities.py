@@ -31,7 +31,8 @@ def s3_save_as_json(data, bucket, key):
     >>> key = "path/to/object.json"
     >>> s3_save(data, bucket, key)
     Saved to my-s3-bucket/path/to/object.json
-    """   
+    """ 
+    s3_client = boto3.client('s3', region_name = 'eu-west-2')  
     try:
         s3_client.put_object(
             Bucket=bucket,
@@ -54,7 +55,7 @@ def s3_save_as_csv(data, headers, bucket, key):
     - bucket: Name of the S3 bucket.
     - key: The S3 object key for the file location.
     """
-
+    s3_client = boto3.client('s3', region_name = 'eu-west-2')
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_file:
         temp_path = temp_file.name
         
