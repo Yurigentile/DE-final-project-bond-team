@@ -21,7 +21,7 @@ def get_latest_data(conn, tables, sync_timestamp):
         Example:
         {
             'table_name_1': [],
-            'table_name_2': [
+            'table_name_2': [q
                 {
                     'column_1': cell_1,
                     'column_2': cell_2
