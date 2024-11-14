@@ -16,7 +16,7 @@ def get_latest_data(conn, tables, sync_timestamp):
 
     Returns:
         A dictionary, where each key represents table and value represents list of dictionaries.
-        The nested list represents queried database rows
+        The nested list represents queried database rows.
     
         Example:
         {
