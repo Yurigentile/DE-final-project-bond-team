@@ -1,24 +1,33 @@
 from src.extract_lambda.handler import lambda_handler
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from src.s3_helpers import retrieve_list_of_s3_files
 
 
 def test_lambda_handler_upload_to_s3():
-    # Mock the boto3 client's put_object method
-    with patch("src.s3_save_utilities.s3_client.put_object") as mock_put_object:
-        # Call the function with a mock event
-        lambda_handler(
-            {
-                "task": "upload_to_s3",
-                "data": {"example": "data"},
-                "bucket": "my-bucket",
-                "key": "path/to/file.json",
-            },
-            None,
-        )
-
-        # Simply assert that put_object was called
-        mock_put_object.assert_called()
+    """Test successful S3 upload scenario"""
+    event = {
+        "task": "upload_to_s3",
+        "data": {"example": "data"},
+        "bucket": "my-bucket",
+        "key": "path/to/file.json",
+    }
+    
+    # Create a mock for the S3 client
+    mock_s3_client = Mock()
+    mock_s3_client.put_object.return_value = {
+        'ResponseMetadata': {'HTTPStatusCode': 200}
+    }
+    
+    # Patch boto3.client to return our mock
+    with patch('boto3.client', return_value=mock_s3_client):
+        response = lambda_handler(event, None)
+        
+        # Verify put_object was called with correct arguments
+        mock_s3_client.put_object.assert_called_once()
+        call_args = mock_s3_client.put_object.call_args[1]
+        assert call_args['Bucket'] == 'my-bucket'
+        assert call_args['Key'] == 'path/to/file.json'
+        assert isinstance(call_args['Body'], str)
 
 
 def test_retrieve_files():

@@ -4,8 +4,6 @@ import os
 import tempfile
 import csv
 
-s3_client = boto3.client('s3', region_name = 'eu-west-2')
-
 def s3_save_as_json(data, bucket, key):
     """
     Saves data to an S3 bucket as a JSON file.
