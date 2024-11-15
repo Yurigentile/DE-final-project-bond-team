@@ -1,3 +1,12 @@
+#Installing dependencies in layer directory for dependency layer
+resource "null_resource" "install_layer_dependencies" {
+  provisioner "local-exec" {
+    command = "pip install -r ${path.module}/../extract_layer/requirements.txt -t ${path.module}/../extract_layer/python/lib/python3.12/site-packages"
+  }
+  triggers = {
+    trigger = timestamp()
+  }
+}
 
 #Zipping handler function and dependency layer
 data "archive_file" "lambda" {
@@ -10,8 +19,11 @@ data "archive_file" "lambda" {
 data "archive_file" "layer_dependencies" {
   type             = "zip"
   output_file_mode = "0666"
-  source_dir       = "${path.module}/../python"
+  source_dir       = "${path.module}/../extract_layer/python"
   output_path      = "${path.module}/../dependencies.zip"
+  depends_on = [
+    null_resource.install_layer_dependencies
+  ]
 }
 
 #Uploading them to the code S3 bucket

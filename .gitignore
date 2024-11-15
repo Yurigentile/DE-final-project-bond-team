@@ -5,6 +5,7 @@ __pycache__
 *.tfstate*
 *__pycache__
 *.pytest_cache
-python
 create_layer
-*.zip*
+*dependencies.zip*
+*extract_lambda.zip*
+extract_layer/python/lib/python3.12/site-packages
