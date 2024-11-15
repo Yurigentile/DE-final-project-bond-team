@@ -6,6 +6,6 @@ __pycache__
 *__pycache__
 *.pytest_cache
 create_layer
-*dependencies.zip*
-*extract_lambda.zip*
+dependencies.zip
+extract_lambda.zip
 extract_layer/python/lib/python3.12/site-packages

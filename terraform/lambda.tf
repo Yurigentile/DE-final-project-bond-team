@@ -31,14 +31,12 @@ resource "aws_s3_object" "file_upload_extract_lambda" {
   bucket = "${aws_s3_bucket.code.id}"
   key    = "lambda-functions/extract_lambda.zip"
   source = "${path.module}/../extract_lambda.zip"
-  # source_hash   = filemd5("${path.module}/../extract_lambda.zip")
 }
 
 resource "aws_s3_object" "file_upload_dependencies" {
   bucket = "${aws_s3_bucket.code.id}"
   key    = "layers/dependencies.zip"
   source = "${path.module}/../dependencies.zip"
-  # source_hash   = filemd5("${path.module}/../dependencies.zip")
 }
 
 #Deploying layer
@@ -53,7 +51,7 @@ resource "aws_lambda_layer_version" "requests_layer_dependencies" {
 resource "aws_lambda_function" "extract_handler" {
   s3_bucket     = aws_s3_bucket.code.bucket
   s3_key        = "lambda-functions/extract_lambda.zip"
-  function_name = "handler"
+  function_name = "extract"
   role          = aws_iam_role.lambda_role.arn
   handler       = "handler.lambda_handler"
   runtime       = var.python_runtime
