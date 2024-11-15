@@ -9,7 +9,7 @@ data "archive_file" "lambda" {
 data "archive_file" "layer_util_functions" {
   type             = "zip"
   output_file_mode = "0666"
-  source_dir       = "${path.module}/../src"
+  source_dir       = "${path.module}/../extract_lambda"
   output_path      = "${path.module}/../extract_util_functions.zip"
 }
 data "archive_file" "layer_dependencies" {
@@ -60,10 +60,10 @@ resource "aws_lambda_layer_version" "requests_layer_dependencies" {
 
 resource "aws_lambda_function" "extract_handler" {
   s3_bucket     = aws_s3_bucket.code.bucket
-  s3_key        = "extract_lambda.zip"
-  function_name = "Extract"
+  s3_key        = "lambda-functions/extract_lambda.zip"
+  function_name = "handler"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "Extract.handler"
+  handler       = "handler.lambda_handler"
   runtime       = var.python_runtime
   layers        = [aws_lambda_layer_version.requests_layer_dependencies.arn,aws_lambda_layer_version.requests_layer_util_functions.arn]
 } 
