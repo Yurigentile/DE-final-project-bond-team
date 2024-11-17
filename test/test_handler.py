@@ -1,7 +1,47 @@
 from src.extract_lambda.handler import lambda_handler
 from unittest.mock import patch, Mock
 from src.s3_helpers import retrieve_list_of_s3_files
+import boto3
+from moto import mock_aws
+import pprint
+import logging
 
+@mock_aws(config={
+    "core": {
+        "mock_credentials": False,
+        "passthrough": {
+            "services": ["secretsmanager"]
+        }
+    }
+})
+def test_lambda_handler_run():
+    logger = logging.getLogger()
+
+    bucket = "test-data"
+    region = 'eu-west-2'
+
+    boto3.client("s3").create_bucket(Bucket=bucket, CreateBucketConfiguration={"LocationConstraint": region})
+
+    event = {
+        "secret": "totes-database",
+        "bucket": bucket,
+    }
+
+    # First run
+    lambda_handler(event, None)
+
+    object_list = boto3.client("s3").list_objects_v2(Bucket=bucket)
+    logger.debug(pprint.pformat(object_list))
+
+    last_object_key = object_list['Contents'][-1]['Key']
+
+    object = boto3.client("s3").get_object(Bucket=bucket, Key=last_object_key)
+    content = object['Body'].read().decode('utf-8')
+
+    logger.debug(content)
+
+    # Second run
+    # lambda_handler(event, None)
 
 def test_lambda_handler_upload_to_s3():
     """Test successful S3 upload scenario"""

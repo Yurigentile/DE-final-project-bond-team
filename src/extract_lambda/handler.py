@@ -1,31 +1,96 @@
-import boto3
-import json
+from datetime import datetime
+import re
 import logging
 from src.s3_save_utilities import s3_save_as_json
-from src.s3_helpers import retrieve_list_of_s3_files, create_object_with_datetime_key
+from src.s3_helpers import retrieve_list_of_s3_files
+from src.secrets_manager import get_secret
+from src.db_connection import create_conn
+from src.db_query import get_latest_data
 
 def lambda_handler(event, context):
     """
-    AWS Lambda Handler to extract data from a database and upload to S3
+    AWS Lambda Handler to extract latest data from Postgres database and upload to AWS S3 bucket.
+
+    Events format:
+
+        {
+            "secret" = "aws_secretsmanager_secret_name,"
+            "bucket" = "aws_s3_bucket_name"
+        }
+
+    The S3 bucket folders structure looks like this:
+
+    bucket-name
+        2024-11-15 23:00:00
+            design.json
+            sales_order.json
+            staff.json
+            currency.json
+            counterparty.json
+            address.json
+            department.json
+            purchase_order.json
+            payment_type.json
+            payment.json
+            transaction.json
+        2024-11-15 23:30:00
+            design.json
+            sales_order.json
+            staff.json
+            currency.json
+            counterparty.json
+            address.json
+            department.json
+            purchase_order.json
+            payment_type.json
+            payment.json
+            transaction.json
+
+    Each folder represents timestamp of the lambda function run.
+    Each JSON object in bucket represents data delta since the last sync time.
     """
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
-    
-    logger.info("Passed event: task=%s, bucket=%s", event.get("task"), event.get("bucket"))
-    task = event.get("task")
-    folder = event.get("folder", "default_folder")
 
-    # print(f"Task: {task}, Folder: {folder}")
-    # if task == "format_key_for_upload":
-    #     create_object_with_datetime_key(folder)   
-    if task == 'upload_to_s3':
-        data = event.get("data", {})
-        bucket = event.get("bucket")
-        key = event.get("key")
-        return s3_save_as_json(data, bucket, key)
-    elif task == 'retrieve_files':
-        bucket = event.get("bucket")
-        return retrieve_list_of_s3_files(bucket)
+    
+    secret = event.get("secret")
+    bucket = event.get("bucket")
+
+    logger.info("Passed event: secret=%s, bucket=%s", secret, bucket)
+
+    objects_list = retrieve_list_of_s3_files(bucket)
+    
+    if len(objects_list) == 0:
+        last_sync_timestamp = '2000-01-01 00:00:00'
     else:
-        logger.error("Unknown task: %s", task)
-        return {'body': 'Unknown task'}
+        sorted_object_list = sorted(objects_list)
+
+        last_object_name = sorted_object_list[-1]
+
+        last_sync_timestamp = re.match(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/", last_object_name).group(1)
+
+    database_credentials_string = get_secret(secret)
+
+    conn = create_conn(database_credentials_string)
+
+    tables = [
+        "design",
+        "sales_order",
+        "staff",
+        "currency",
+        "counterparty",
+        "address",
+        "department",
+        "purchase_order",
+        "payment_type",
+        "payment",
+        "transaction",
+    ]
+
+    latest_data = get_latest_data(conn, tables, last_sync_timestamp)
+
+    current_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    for table, rows in latest_data.items():
+        s3_save_as_json(rows, bucket, f"{current_timestamp}/{table}.json")
+

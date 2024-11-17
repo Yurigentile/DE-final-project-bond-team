@@ -3,10 +3,11 @@ import boto3
 import os
 import tempfile
 import csv
+from src.custom_json_serialiser import custom_json_serializer
 
 def s3_save_as_json(data, bucket, key):
     """
-    Saves data to an S3 bucket as a JSON file.
+    Saves data to an S3 bucket as a JSON file. 
 
     Parameters:
     - data (dict): The data to be saved to the S3 bucket. This should be in dictionary format,
@@ -35,7 +36,7 @@ def s3_save_as_json(data, bucket, key):
         s3_client.put_object(
             Bucket=bucket,
             Key=key,
-            Body=json.dumps(data),
+            Body=json.dumps(data, default=custom_json_serializer),
             ContentType='application/json'
         )
         print(f"Saved to {bucket}/{key}")
