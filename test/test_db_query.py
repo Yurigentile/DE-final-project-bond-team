@@ -1,6 +1,6 @@
 from src.db_query import get_latest_data
-from src.db_connection import create_conn
-from src.secrets_manager import get_secret
+from extract_lambda.src.db_connection import create_conn
+from extract_lambda.src.secrets_manager import get_secret
 from datetime import datetime, timedelta
 # TODO: unskip when test DB is ready
 
