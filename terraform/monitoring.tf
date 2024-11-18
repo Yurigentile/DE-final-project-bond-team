@@ -15,6 +15,7 @@ resource "aws_cloudwatch_log_metric_filter" "error_metric_filter_ingest" {
   }
 }
 
+
 resource "aws_cloudwatch_log_metric_filter" "warning_metric_filter_ingest" {
   name           = "IngestionLogWarningFilter"
   pattern        = "WARNING"
