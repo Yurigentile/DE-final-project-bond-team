@@ -12,3 +12,16 @@ variable "lambda_name" {
   type = string
   default = "extract-handler"
 }
+
+variable "python_runtime" {
+  type    = string
+  default = "python3.12"
+}
+
+
+
+
+
+
+
+

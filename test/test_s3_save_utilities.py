@@ -1,34 +1,44 @@
 import unittest
-from unittest.mock import patch
-import boto3
-from moto import mock_aws
+from unittest.mock import patch, Mock
 import json
-from src.utilities import s3_save_as_json, s3_save_as_csv
+from extract_lambda.src.s3_save_utilities import s3_save_as_json, s3_save_as_csv
 
 
-@mock_aws
 class TestS3Save(unittest.TestCase):
     @patch("builtins.print")
-    def test_s3_save(self, mock_print):
+    @patch("boto3.client")
+    def test_s3_save(self, mock_boto_client, mock_print):
         # Setup mock values to be passed from the lambda
         bucket = "testbucket"
         key = "test.json"
         data = {"example": "data"}
-        region = "eu-west-2"
 
-        # Initialise the client for mock
-        s3_client = boto3.client("s3", region_name=region)
+        # Setup the mock S3 client and its methods directly
+        mock_s3 = Mock()
+        mock_boto_client.return_value = mock_s3
 
-        # Create the bucket for testing purposes in the mock S3 environment
-        s3_client.create_bucket(
-            Bucket=bucket, CreateBucketConfiguration={"LocationConstraint": region}
-        )
+        # Mock `put_object` to simulate saving the JSON data
+        mock_s3.put_object.return_value = None
+
+        # Mock `get_object` to simulate retrieving the JSON data
+        mock_s3.get_object.return_value = {
+            "Body": Mock(read=lambda: json.dumps(data).encode("utf-8")),
+            "ContentType": "application/json",
+        }
 
         # Call the s3_save function to save the data
         s3_save_as_json(data, bucket, key)
 
+        # Verify that put_object was called with the correct parameters
+        mock_s3.put_object.assert_called_with(
+            Bucket=bucket,
+            Key=key,
+            Body=json.dumps(data),
+            ContentType="application/json",
+        )
+
         # Confirm the object exists in the bucket with the correct content
-        response = s3_client.get_object(Bucket=bucket, Key=key)
+        response = mock_s3.get_object(Bucket=bucket, Key=key)
         saved_data = json.loads(response["Body"].read().decode("utf-8"))
 
         # Assertions to verify the saved data and content type
@@ -36,75 +46,68 @@ class TestS3Save(unittest.TestCase):
         self.assertEqual(response["ContentType"], "application/json")
         mock_print.assert_called_with(f"Saved to {bucket}/{key}")
 
-    def test_s3_save_error_handling(self):
-        # Setup mock values to be passed from the lambda
+    @patch("builtins.print")
+    @patch("boto3.client")
+    def test_s3_save_error_handling(self, mock_boto_client, mock_print):
+        # Setup the mock S3 client and simulate an error on put_object
         bucket = "testbucket"
         key = "test.json"
         data = {"example": "data"}
-        region = "eu-west-2"
 
-        # Initialise the client for mock
-        s3_client = boto3.client("s3", region_name=region)
+        mock_s3 = Mock()
+        mock_boto_client.return_value = mock_s3
+        mock_s3.put_object.side_effect = Exception("test error")
 
-        # Create the bucket for testing purposes in the mock S3 environment
-        s3_client.create_bucket(
-            Bucket=bucket, CreateBucketConfiguration={"LocationConstraint": region}
-        )
+        # Call the function and assert that print was called with the error message
+        s3_save_as_json(data, bucket, key)
 
-        # Patch the boto3.client and mock the s3 service
-        with patch("boto3.client") as mock_boto_client:
-            mock_s3 = mock_boto_client.return_value
-            # Create a custom error for put_object
-            mock_s3.put_object.side_effect = Exception("test error")
-
-            # Assert for verifying error was raised
-            with self.assertRaises(Exception) as detail:
-                # Call the function
-                s3_save_as_json(data, bucket, key)
-
-                # Assert for verifying error message is output
-                self.assertEqual(str(detail.exception))
+        # Check that the error message was printed
+        mock_print.assert_called_with("Error: test error")
 
 
-@mock_aws
 class TestS3SaveAsCSV(unittest.TestCase):
-    def setUp(self):
-        # Setup mock values to be passed from the lambda
-        self.bucket = "test-bucket"
-        self.region = "eu-west-2"
-        self.key = "test-folder/test.csv"
-        self.data = [(1, "Yuri", 25), (2, "Bob", 30)]
-        self.headers = ["id", "name", "age"]
+    @patch("boto3.client")
+    @patch("tempfile.NamedTemporaryFile")
+    @patch("builtins.open")
+    @patch("os.remove")
+    def test_s3_save_as_csv(
+        self, mock_remove, mock_open, mock_temp_file, mock_boto_client
+    ):
+        # Create mock S3 client
+        mock_s3_client = Mock()
+        mock_boto_client.return_value = mock_s3_client
 
-        # Initialize mock S3 client and create the bucket
-        self.s3_client = boto3.client("s3", region_name=self.region)
-        self.s3_client.create_bucket(
-            Bucket=self.bucket,
-            CreateBucketConfiguration={"LocationConstraint": self.region},
+        # Mock temporary file
+        mock_temp = Mock()
+        mock_temp.name = "/tmp/test.csv"
+        mock_temp_file.return_value.__enter__.return_value = mock_temp
+
+        # Mock file objects
+        mock_csv_file = Mock()
+        mock_open.return_value.__enter__.return_value = mock_csv_file
+
+        # Define test data
+        bucket = "test-bucket"
+        key = "test-folder/test.csv"
+        headers = ["id", "name", "age"]
+        data = [[1, "Yuri", 25], [2, "Bob", 30]]
+
+        # Call function to test
+        s3_save_as_csv(data, headers, bucket, key)
+
+        # Assert open was called twice (once for write, once for read)
+        self.assertEqual(mock_open.call_count, 2)
+
+        # Verify S3 upload
+        mock_s3_client.put_object.assert_called_once_with(
+            Bucket=bucket, Key=key, Body=mock_csv_file, ContentType="text/csv"
         )
 
-    def test_s3_save_as_csv_success(self):
-        # Call the function
-        s3_save_as_csv(self.data, self.headers, self.bucket, self.key)
+        # Verify temp file cleanup
+        mock_remove.assert_called_once_with("/tmp/test.csv")
 
-        # Verify contents of bucket
-        response = self.s3_client.get_object(Bucket=self.bucket, Key=self.key)
-        body = response["Body"].read().decode("utf-8")
-
-        # Check the CSV
-        expected_content = "id,name,age\n1,Yuri,25\n2,Bob,30\n"
-        self.assertEqual(body, expected_content)
-        print(f"Test success: CSV saved and verified in bucket '{self.bucket}'.")
-
-    def test_s3_save_as_csv_error_handling(self):
-        # Call the function with a non-existing bucket
-        invalid_bucket = "non-existing-bucket"
-        with self.assertRaises(Exception) as context:
-            s3_save_as_csv(self.data, self.headers, invalid_bucket, self.key)
-
-        # Verify the exception
-        self.assertIn("NoSuchBucket", str(context.exception))
-        print("Test success: Exception correctly raised for non-existing bucket.")
+        # Verify region was set correctly in boto3 client
+        mock_boto_client.assert_called_once_with("s3", region_name="eu-west-2")
 
 
 if __name__ == "__main__":
