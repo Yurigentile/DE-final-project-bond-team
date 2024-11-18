@@ -6,14 +6,14 @@ import boto3
 from datetime import datetime
 from decimal import Decimal
 
-@mock_aws(config={
-    "core": {
-        "mock_credentials": False,
-        "passthrough": {
-            "services": ["secretsmanager"]
-        }
-    }
-})
+# @mock_aws(config={
+#     "core": {
+#         "mock_credentials": False,
+#         "passthrough": {
+#             "services": ["secretsmanager"]
+#         }
+#     }
+# })
 def test_lambda_handler_run():
     bucket = "test-data"
     region = 'eu-west-2'

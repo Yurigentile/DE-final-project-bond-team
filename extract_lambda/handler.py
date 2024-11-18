@@ -8,7 +8,7 @@ if os.environ.get("AWS_EXECUTION_ENV") is not None:
     from src.s3_helpers import retrieve_list_of_s3_files
     from src.secrets_manager import get_secret
     from src.db_connection import create_conn
-    from extract_lambda.src.db_query import get_latest_data
+    from src.db_query import get_latest_data
     # For use in lambda function
 else:
     # For local use

@@ -3,7 +3,8 @@ import boto3
 import os
 import tempfile
 import csv
-from extract_lambda.src.custom_json_serialiser import custom_json_serializer
+from datetime import datetime
+from decimal import Decimal
 
 def s3_save_as_json(data, bucket, key):
     """
@@ -73,3 +74,15 @@ def s3_save_as_csv(data, headers, bucket, key):
         print(f"Data saved to {bucket}/{key}")
 
     os.remove(temp_path)        
+
+def custom_json_serializer(obj):
+    """
+    Default JSON serilaiser doesn't handle datetime and decimal data types.
+    This is custom JSON serialiser handles them both.
+    """
+
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, Decimal):
+        return float(obj)
+    return obj

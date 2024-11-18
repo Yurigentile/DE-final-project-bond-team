@@ -79,3 +79,29 @@ resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.cw_policy.arn
 }
+
+# -------------------------------------
+# Lambda IAM Policy for secrets manager
+# -------------------------------------
+# Define
+data "aws_iam_policy_document" "secrets_manager_policy_doc" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",  
+    ]
+    resources = ["*"]
+  }
+}
+
+# Create
+resource "aws_iam_policy" "secrets_manager_access_policy" {
+  name_prefix = "secrets-manager-policy-${var.lambda_name}-access"
+  policy      = data.aws_iam_policy_document.secrets_manager_policy_doc.json
+}
+
+# Attach
+resource "aws_iam_role_policy_attachment" "secrets_manager_access_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.secrets_manager_access_policy.arn
+}

@@ -19,7 +19,7 @@ data "archive_file" "lambda" {
 data "archive_file" "layer_dependencies" {
   type             = "zip"
   output_file_mode = "0666"
-  source_dir       = "${path.module}/../extract_layer/python"
+  source_dir       = "${path.module}/../extract_layer"
   output_path      = "${path.module}/../dependencies.zip"
   depends_on = [
     null_resource.install_layer_dependencies
