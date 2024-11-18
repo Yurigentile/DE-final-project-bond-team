@@ -1,7 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 
-client = boto3.client("secretsmanager")
+
 
 
 def get_secret(name):
@@ -17,6 +17,7 @@ def get_secret(name):
       String value of the secret or an informative error message.
 
     """
+    client = boto3.client("secretsmanager")
     try:
         response = client.get_secret_value(SecretId=name)
         secret_value = response["SecretString"]
