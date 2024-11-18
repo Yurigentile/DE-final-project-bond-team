@@ -1,3 +1,4 @@
+
 #log group
 resource "aws_cloudwatch_log_group" "ingestion_lambda_log_group" {
   name = "aws/lambda/" ##### pass lambda function!!!!!!!!!!!!!
