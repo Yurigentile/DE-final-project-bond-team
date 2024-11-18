@@ -1,4 +1,4 @@
-from src.s3_helpers import create_object_with_datetime_key as cod, retrieve_list_of_s3_files
+from extract_lambda.src.s3_helpers import create_object_with_datetime_key as cod, retrieve_list_of_s3_files
 import re
 import unittest
 from unittest.mock import patch, Mock

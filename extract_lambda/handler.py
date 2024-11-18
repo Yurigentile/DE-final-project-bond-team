@@ -1,8 +1,16 @@
 import boto3
 import json
 import logging
-from src.s3_save_utilities import s3_save_as_json
-from src.s3_helpers import retrieve_list_of_s3_files, create_object_with_datetime_key
+import os
+if os.environ.get("AWS_EXECUTION_ENV") is not None:
+    # For use in lambda function
+    from src.s3_save_utilities import s3_save_as_json
+    from src.s3_helpers import retrieve_list_of_s3_files, create_object_with_datetime_key
+else:
+    # For local use
+    from extract_lambda.src.s3_save_utilities import s3_save_as_json
+    from extract_lambda.src.s3_helpers import retrieve_list_of_s3_files, create_object_with_datetime_key
+    
 
 def lambda_handler(event, context):
     """

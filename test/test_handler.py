@@ -1,6 +1,6 @@
-from src.extract_lambda.handler import lambda_handler
+from extract_lambda.handler import lambda_handler
 from unittest.mock import patch, Mock
-from src.s3_helpers import retrieve_list_of_s3_files
+from extract_lambda.src.s3_helpers import retrieve_list_of_s3_files
 
 
 def test_lambda_handler_upload_to_s3():
