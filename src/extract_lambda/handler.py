@@ -11,6 +11,7 @@ def lambda_handler(event, context):
     """
     AWS Lambda Handler to extract latest data from Postgres database and upload to AWS S3 bucket.
 
+    
     Events format:
 
         {
