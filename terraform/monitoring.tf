@@ -1,21 +1,13 @@
-
-#log group
-resource "aws_cloudwatch_log_group" "ingestion_lambda_log_group" {
-  name = "aws/lambda/" ##### pass lambda function!!!!!!!!!!!!!
-  #retention_in_days = 7
+#data source
+data "aws_cloudwatch_log_group" "ingestion_lambda_log_group" {
+  name = "/aws/lambda/extract"
 }
-
-#log stream - should be created automatically by lambda
-# resource "aws_cloudwatch_log_stream" "ingestion_lambda_log_stream" {
-#   name           = "IngestionLambdaLogStream"
-#   log_group_name = aws_cloudwatch_log_group.ingestion_lambda_log_group.name
-# }
 
 #metric filters
 resource "aws_cloudwatch_log_metric_filter" "error_metric_filter_ingest" {
   name           = "IngestionLogErrorFilter"
   pattern        = "ERROR"
-  log_group_name = aws_cloudwatch_log_group.ingestion_lambda_log_group.name
+  log_group_name = data.aws_cloudwatch_log_group.ingestion_lambda_log_group.name
   metric_transformation {
     name      = "IngestionErrorLogCount"
     namespace = "IngestionMetrics"
@@ -26,7 +18,7 @@ resource "aws_cloudwatch_log_metric_filter" "error_metric_filter_ingest" {
 resource "aws_cloudwatch_log_metric_filter" "warning_metric_filter_ingest" {
   name           = "IngestionLogWarningFilter"
   pattern        = "WARNING"
-  log_group_name = aws_cloudwatch_log_group.ingestion_lambda_log_group.name
+  log_group_name = data.aws_cloudwatch_log_group.ingestion_lambda_log_group.name
   metric_transformation {
     name      = "IngestionWarningLogCount"
     namespace = "IngestionMetrics"
@@ -37,7 +29,7 @@ resource "aws_cloudwatch_log_metric_filter" "warning_metric_filter_ingest" {
 resource "aws_cloudwatch_log_metric_filter" "runtimeerror_metric_filter_ingest" {
   name           = "IngestionLogRunTimeErrorFilter"
   pattern        = "RUNTIMEERROR"
-  log_group_name = aws_cloudwatch_log_group.ingestion_lambda_log_group.name
+  log_group_name = data.aws_cloudwatch_log_group.ingestion_lambda_log_group.name
   metric_transformation {
     name      = "IngestionRunTimeErrorLogCount"
     namespace = "IngestionMetrics"
