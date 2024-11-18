@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch, Mock
 import json
 from botocore.exceptions import ClientError
-from src.secrets_manager import get_secret
+from extract_lambda.src.secrets_manager import get_secret
 
 def test_get_secret_find_secret():
     # Create mock secret value

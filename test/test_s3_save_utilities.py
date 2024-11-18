@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 import json
-from src.s3_save_utilities import s3_save_as_json, s3_save_as_csv
+from extract_lambda.src.s3_save_utilities import s3_save_as_json, s3_save_as_csv
 
 
 class TestS3Save(unittest.TestCase):

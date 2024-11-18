@@ -1,4 +1,4 @@
-from src.db_connection import create_conn
+from extract_lambda.src.db_connection import create_conn
 import json
 import unittest
 
