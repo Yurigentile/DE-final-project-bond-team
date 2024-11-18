@@ -3,7 +3,7 @@ import boto3
 import os
 import tempfile
 import csv
-from src.custom_json_serialiser import custom_json_serializer
+from extract_lambda.src.custom_json_serialiser import custom_json_serializer
 
 def s3_save_as_json(data, bucket, key):
     """
