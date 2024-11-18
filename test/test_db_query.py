@@ -1,4 +1,4 @@
-from src.db_query import get_latest_data
+from extract_lambda.src.db_query import get_latest_data
 from extract_lambda.src.db_connection import create_conn
 from extract_lambda.src.secrets_manager import get_secret
 from datetime import datetime, timedelta

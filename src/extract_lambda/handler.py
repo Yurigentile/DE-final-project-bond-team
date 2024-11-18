@@ -1,23 +1,11 @@
 from datetime import datetime
 import re
 import logging
-
-import os
-if os.environ.get("AWS_EXECUTION_ENV") is not None:
-    from src.s3_save_utilities import s3_save_as_json
-    from src.s3_helpers import retrieve_list_of_s3_files
-    from src.secrets_manager import get_secret
-    from src.db_connection import create_conn
-    from extract_lambda.src.db_query import get_latest_data
-    # For use in lambda function
-else:
-    # For local use
-    from extract_lambda.src.s3_save_utilities import s3_save_as_json
-    from extract_lambda.src.s3_helpers import retrieve_list_of_s3_files
-    from extract_lambda.src.secrets_manager import get_secret
-    from extract_lambda.src.db_connection import create_conn
-    from extract_lambda.src.db_query import get_latest_data
-    
+from src.s3_save_utilities import s3_save_as_json
+from src.s3_helpers import retrieve_list_of_s3_files
+from src.secrets_manager import get_secret
+from src.db_connection import create_conn
+from extract_lambda.src.db_query import get_latest_data
 
 def lambda_handler(event, context):
     """
@@ -106,3 +94,4 @@ def lambda_handler(event, context):
 
     for table, rows in latest_data.items():
         s3_save_as_json(rows, bucket, f"{current_timestamp}/{table}.json")
+
