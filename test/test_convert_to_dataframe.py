@@ -1,4 +1,4 @@
-from src.convert_to_dataframe import convert_dictionary_to_dataframe
+from transform_lambda.src.convert_to_dataframe import convert_dictionary_to_dataframe
 import pandas as pd
 import pytest
 import unittest
