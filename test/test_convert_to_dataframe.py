@@ -1,47 +1,60 @@
-from src.convert_to_dataframe import convert_json_to_dataframe
+from src.convert_to_dataframe import convert_dictionary_to_dataframe
 import pandas as pd
+import pytest
+import unittest
 
 
-data = {
-  "Duration":{
-    "0":60,
-    "1":60,
-    "2":60,
-    "3":45,
-    "4":45,
-    "5":60
-  },
-  "Pulse":{
-    "0":110,
-    "1":117,
-    "2":103,
-    "3":109,
-    "4":117,
-    "5":102
-  },
-  "Maxpulse":{
-    "0":130,
-    "1":145,
-    "2":135,
-    "3":175,
-    "4":148,
-    "5":127
-  },
-  "Calories":{
-    "0":409,
-    "1":479,
-    "2":340,
-    "3":282,
-    "4":406,
-    "5":300
-  }
-}
+data = {'address': [],
+ 'counterparty': [],
+ 'currency': [],
+ 'department': [],
+ 'design': [],
+ 'payment': [{'company_ac_number': 77980960,
+              'counterparty_ac_number': 78566145,
+              'counterparty_id': 17,
+              'created_at': '2024-11-19T12:20:10.216000',
+              'currency_id': 2,
+              'last_updated': '2024-11-19T12:20:10.216000',
+              'paid': False,
+              'payment_amount': 52444.38,
+              'payment_date': '2024-11-19',
+              'payment_id': 15892,
+              'payment_type_id': 1,
+              'transaction_id': 15892}],
+ 'payment_type': [],
+ 'purchase_order': [],
+ 'sales_order': [{'agreed_delivery_date': '2024-11-20',
+                  'agreed_delivery_location_id': 20,
+                  'agreed_payment_date': '2024-11-19',
+                  'counterparty_id': 17,
+                  'created_at': '2024-11-19T12:20:10.216000',
+                  'currency_id': 2,
+                  'design_id': 243,
+                  'last_updated': '2024-11-19T12:20:10.216000',
+                  'sales_order_id': 11229,
+                  'staff_id': 7,
+                  'unit_price': 2.49,
+                  'units_sold': 21062}],
+ 'staff': [],
+ 'transaction': [{'created_at': '2024-11-19T12:20:10.216000',
+                  'last_updated': '2024-11-19T12:20:10.216000',
+                  'purchase_order_id': None,
+                  'sales_order_id': 11229,
+                  'transaction_id': 15892,
+                  'transaction_type': 'SALE'}]}
+
+
 def xtest_data_type_converted_json():
-    dataframe = convert_json_to_dataframe(data)
-    assert type(dataframe) == pd.core.frame.DataFrame
+    output_dataframe = convert_dictionary_to_dataframe(data)
+    assert type(output_dataframe) == pd.core.frame.DataFrame
 
-def test_multiple_json():
-    datadict = {"data1" : data, "data2" : data}
-    dataframe = convert_json_to_dataframe(datadict)
-    assert type(dataframe["data1"]) == pd.core.frame.DataFrame
-    assert type(dataframe["data2"]) == pd.core.frame.DataFrame
+def test_function_returns_dict_of_dataframes_with_multiple_dictionary_input():
+    output_dataframe = convert_dictionary_to_dataframe(data)
+    assert type(output_dataframe["payment"]) == pd.core.frame.DataFrame
+    assert type(output_dataframe["sales_order"]) == pd.core.frame.DataFrame
+  
+class TestExceptions(unittest.TestCase):
+    def test_raises_exception_with_invalid_input(self):
+        with self.assertRaises(Exception) as detail:
+            convert_dictionary_to_dataframe('invalid_input')
+            self.assertEqual(str(detail.exception))

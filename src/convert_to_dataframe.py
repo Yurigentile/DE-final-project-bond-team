@@ -1,11 +1,11 @@
 import pandas as pd
-import boto3
-        
-#Need to discuss if it`s better to trigger the lambda with another lambda or from the update of the bucket
 
-def convert_json_to_dataframe(datadict):  
-        newdict = {}
-        for key in datadict:               
-                newdict[key] = pd.DataFrame(datadict[key]) 
-        print(newdict)
-        return newdict
+
+def convert_dictionary_to_dataframe(data_dict):
+    try:
+        new_dict = {}
+        for table in data_dict:               
+                new_dict[table] = pd.DataFrame(data_dict[table])
+        return new_dict
+    except Exception as e:
+        print(f'Error: {e}')
