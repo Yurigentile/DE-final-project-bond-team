@@ -1,4 +1,7 @@
-from extract_lambda.src.s3_helpers import create_object_with_datetime_key as cod, retrieve_list_of_s3_files
+from extract_lambda.src.s3_helpers import (
+    create_object_with_datetime_key as cod,
+    retrieve_list_of_s3_files,
+)
 import re
 import unittest
 from unittest.mock import patch, Mock
@@ -38,8 +41,7 @@ def test_create_object_with_datetime_key_aws_compatibility():
 
 
 class TestS3Functions(unittest.TestCase):
-
-    @patch('boto3.client')
+    @patch("boto3.client")
     def setUp(self, mock_boto_client):
         # Mock S3 client
         self.mock_s3 = Mock()
@@ -47,35 +49,37 @@ class TestS3Functions(unittest.TestCase):
 
         # Mock bucket data
         def mock_list_objects_v2(Bucket):
-            if Bucket == 'test-bucket':
+            if Bucket == "test-bucket":
                 return {
-                    'Contents': [
-                        {'Key': 'fake_file1.json'},
-                        {'Key': 'fake_file2.json'},
-                        {'Key': 'fake_file3.json'},
+                    "Contents": [
+                        {"Key": "fake_file1.json"},
+                        {"Key": "fake_file2.json"},
+                        {"Key": "fake_file3.json"},
                     ]
                 }
             return {}
-        
+
         self.mock_s3.list_objects_v2.side_effect = mock_list_objects_v2
 
-    @patch('boto3.client')
+    @patch("boto3.client")
     def test_retrieve_list_of_s3_files_when_bucket_has_files(self, mock_boto_client):
         mock_boto_client.return_value = self.mock_s3
 
-        bucket = 'test-bucket'
+        bucket = "test-bucket"
         result = retrieve_list_of_s3_files(bucket)
-        self.assertEqual(result, ['fake_file1.json', 'fake_file2.json', 'fake_file3.json'])
+        self.assertEqual(
+            result, ["fake_file1.json", "fake_file2.json", "fake_file3.json"]
+        )
 
-    @patch('boto3.client')
+    @patch("boto3.client")
     def test_retrieve_list_of_s3_files_bucket_empty(self, mock_boto_client):
         mock_boto_client.return_value = self.mock_s3
 
-        bucket = 'empty-bucket'
+        bucket = "empty-bucket"
         result = retrieve_list_of_s3_files(bucket)
         self.assertEqual(result, [])
 
-    @patch('boto3.client')
+    @patch("boto3.client")
     def test_retrieve_list_of_s3_files_bucket_no_credentials(self, mock_boto_client):
         mock_s3 = Mock()
         mock_boto_client.return_value = mock_s3
@@ -84,7 +88,8 @@ class TestS3Functions(unittest.TestCase):
         mock_s3.list_objects_v2.side_effect = NoCredentialsError
 
         with self.assertRaises(NoCredentialsError):
-            retrieve_list_of_s3_files('test-bucket')
+            retrieve_list_of_s3_files("test-bucket")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

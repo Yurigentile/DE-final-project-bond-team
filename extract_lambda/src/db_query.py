@@ -1,7 +1,7 @@
 from pg8000.native import identifier
 
-def get_latest_data(conn, tables, sync_timestamp):
 
+def get_latest_data(conn, tables, sync_timestamp):
     """
     Retrieves rows from specified tables in a PostgreSQL database where the `last_updated`
     column is greater than a given sync timestamp.
@@ -17,7 +17,7 @@ def get_latest_data(conn, tables, sync_timestamp):
     Returns:
         A dictionary, where each key represents table and value represents list of dictionaries.
         The nested list represents queried database rows.
-    
+
         Example:
         {
             'table_name_1': [],
@@ -37,9 +37,12 @@ def get_latest_data(conn, tables, sync_timestamp):
     result = {}
     try:
         for table in tables:
-            rows = conn.run(f"SELECT * FROM {identifier(table)} WHERE last_updated > :sync_timestamp", sync_timestamp=sync_timestamp)
+            rows = conn.run(
+                f"SELECT * FROM {identifier(table)} WHERE last_updated > :sync_timestamp",
+                sync_timestamp=sync_timestamp,
+            )
             columns = [col["name"] for col in conn.columns]
-            result[table] = [dict(zip(columns, row)) for row in rows] 
+            result[table] = [dict(zip(columns, row)) for row in rows]
         return result
     finally:
         conn.close()

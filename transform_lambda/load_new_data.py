@@ -3,8 +3,8 @@ import boto3
 import re
 from pprint import pprint
 
-def retrive_list_of_files(bucket):
 
+def retrive_list_of_files(bucket):
     """
     List all file names in an Amazon S3 bucket.
 
@@ -34,8 +34,8 @@ def retrive_list_of_files(bucket):
         return [obj["Key"] for obj in response["Contents"]]
     return []
 
-def load_new_data(bucket, tables):
 
+def load_new_data(bucket, tables):
     """
     Retrives data from objects in s3 bucket.
 
@@ -94,18 +94,18 @@ def load_new_data(bucket, tables):
     try:
         object_list = retrive_list_of_files(bucket)
         result = {}
-        sorted_files_list= sorted(object_list)
+        sorted_files_list = sorted(object_list)
         last_object_list = sorted_files_list[-1]
-        last_sync_timestamp = re.match(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/", last_object_list).group(1)
+        last_sync_timestamp = re.match(
+            r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/", last_object_list
+        ).group(1)
         for table in tables:
-            response = s3_client.get_object(Bucket=bucket, Key=f"{last_sync_timestamp}/{table}.json")
+            response = s3_client.get_object(
+                Bucket=bucket, Key=f"{last_sync_timestamp}/{table}.json"
+            )
             data = json.loads(response["Body"].read().decode("utf-8"))
             result[table] = data
-        #pprint(result)
+        # pprint(result)
         return result
     except Exception as e:
         print(f"Error: {e}")
-
-
-
-
