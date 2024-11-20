@@ -7,11 +7,12 @@ from src.secrets_manager import get_secret
 from src.db_connection import create_conn
 from extract_lambda.src.db_query import get_latest_data
 
+
 def lambda_handler(event, context):
     """
     AWS Lambda Handler to extract latest data from Postgres database and upload to AWS S3 bucket.
 
-    
+
     Events format:
 
         {
@@ -53,22 +54,23 @@ def lambda_handler(event, context):
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
-    
     secret = event.get("secret")
     bucket = event.get("bucket")
 
     logger.info("Passed event: secret=%s, bucket=%s", secret, bucket)
 
     objects_list = retrieve_list_of_s3_files(bucket)
-    
+
     if len(objects_list) == 0:
-        last_sync_timestamp = '2000-01-01 00:00:00'
+        last_sync_timestamp = "2000-01-01 00:00:00"
     else:
         sorted_object_list = sorted(objects_list)
 
         last_object_name = sorted_object_list[-1]
 
-        last_sync_timestamp = re.match(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/", last_object_name).group(1)
+        last_sync_timestamp = re.match(
+            r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/", last_object_name
+        ).group(1)
 
     database_credentials_string = get_secret(secret)
 
@@ -90,8 +92,7 @@ def lambda_handler(event, context):
 
     latest_data = get_latest_data(conn, tables, last_sync_timestamp)
 
-    current_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     for table, rows in latest_data.items():
         s3_save_as_json(rows, bucket, f"{current_timestamp}/{table}.json")
-
