@@ -55,6 +55,7 @@ resource "aws_lambda_function" "extract_handler" {
   role          = aws_iam_role.lambda_role.arn
   handler       = "handler.lambda_handler"
   runtime       = var.python_runtime
+  timeout       = 120
   layers        = [aws_lambda_layer_version.requests_layer_dependencies.arn]
   source_code_hash = data.archive_file.lambda.output_base64sha256
 } 
