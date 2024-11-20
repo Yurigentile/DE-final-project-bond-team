@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock, MagicMock
 import json
-from transform_lambda.load_new_data import load_new_data, retrive_list_of_files
+from transform_lambda.src.load_new_data import load_new_data, retrive_list_of_files
 from botocore.exceptions import NoCredentialsError, ClientError
 from datetime import datetime
 from decimal import Decimal
