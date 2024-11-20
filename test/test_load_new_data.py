@@ -59,7 +59,7 @@ class TestS3Functions(unittest.TestCase):
 
 class TestLoadNewDataWithoutMoto(unittest.TestCase):
 
-    @patch("transform_lambda.load_new_data.boto3.client")  
+    @patch("transform_lambda.src.load_new_data.boto3.client")  
     def test_load_new_data(self, mock_boto_client):
 
         dataset_stub = {
