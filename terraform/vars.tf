@@ -8,6 +8,11 @@ variable "code_bucket_name" {
   default = "nc-project-totes-code"
 }
 
+variable "processed_bucket_name" {
+  type    = string
+  default = "nc-project-totes-processed"
+}
+
 variable "lambda_name" {
   type = string
   default = "extract-handler"
@@ -17,6 +22,12 @@ variable "python_runtime" {
   type    = string
   default = "python3.12"
 }
+
+variable "extract_event" {
+  type    = string
+  default = "{\"secret\": \"totes-database\",\"bucket\": \"nc-project-totes-data\"}"
+}
+
 
 
 
