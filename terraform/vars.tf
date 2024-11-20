@@ -8,6 +8,12 @@ variable "code_bucket_name" {
   default = "nc-project-totes-code"
 }
 
+
+variable "process_bucket_name" {
+  type    = string
+  default = "nc-project-totes-process"
+}
+
 variable "lambda_name" {
   type = string
   default = "extract-handler"

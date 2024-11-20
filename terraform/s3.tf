@@ -7,6 +7,12 @@ resource "aws_s3_bucket" "code" {
   bucket = var.code_bucket_name
 }
 
+resource "aws_s3_bucket" "process" {
+  bucket = var.process_bucket_name
+}
+
+
+
 # resource "aws_s3_object" "object" {
 #   bucket = aws_s3_bucket.data.id
 #   key    = "test/test2.txt"
