@@ -9,10 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: fake_access_key
-      AWS_SECRET_ACCESS_KEY: fake_secret_key
-      AWS_DEFAULT_REGION: eu-west-2
+    
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
@@ -23,6 +20,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
+#Setup variables for moto testing
+    - name: Set environment variables for mock AWS tests
+      run: |
+        echo "AWS_ACCESS_KEY_ID=fake-access-key-id"
+        echo "AWS_SECRET_ACCESS_KEY=fake-secret-access-key"
+        echo "AWS_REGION=eu-west-2"
   
 # Run pytest
     - name: Test with pytest
