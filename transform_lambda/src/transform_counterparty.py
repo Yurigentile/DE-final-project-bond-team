@@ -13,35 +13,48 @@ def transform_counterparty(counterparty_df, address_df):
 
     Returns:
         new transformed dataframe
+    
+    Side Effects:
+    - Outputs "The input dataframe is empty." message if input dataframe were an empty.
     """
-    dim_counterparty = counterparty_df.copy()
-    dim_counterparty = dim_counterparty.merge(
-        address_df, how="left",
-                    left_on="legal_address_id",
-                    right_on="address_id"
-    )
-    dim_counterparty = dim_counterparty.rename(
-        columns={
-            "address_line_1": "counterparty_legal_address_line_1",
-            "address_line_2": "counterparty_legal_address_line_2",
-            "district": "counterparty_legal_district",
-            "city": "counterparty_legal_city",
-            "postal_code": "counterparty_legal_postal_code",
-            "country": "counterparty_legal_country",
-            "phone": "counterparty_legal_phone_number",
-        }
-    )
-    return dim_counterparty[
-        [
-            "counterparty_id",
-            "counterparty_legal_name",
-            "counterparty_legal_address_line_1",
-            "counterparty_legal_address_line_2",
-            "counterparty_legal_district",
-            "counterparty_legal_city",
-            "counterparty_legal_postal_code",
-            "counterparty_legal_country",
-            "counterparty_legal_phone_number",
+    if counterparty_df.empty:
+        print("The input dataframe is empty.")
+        return counterparty_df
+    if  address_df.empty:
+        print("The input dataframe is empty.")
+        return address_df
+    
+    try:
+        dim_counterparty = counterparty_df.copy()
+        dim_counterparty = dim_counterparty.merge(
+            address_df, how="left",
+                        left_on="legal_address_id",
+                        right_on="address_id"
+            )
+        dim_counterparty = dim_counterparty.rename(
+            columns={
+                "address_line_1": "counterparty_legal_address_line_1",
+                "address_line_2": "counterparty_legal_address_line_2",
+                "district": "counterparty_legal_district",
+                "city": "counterparty_legal_city",
+                "postal_code": "counterparty_legal_postal_code",
+                "country": "counterparty_legal_country",
+                "phone": "counterparty_legal_phone_number",
+            }
+            )
+        return dim_counterparty[
+            [
+                "counterparty_id",
+                "counterparty_legal_name",
+                "counterparty_legal_address_line_1",
+                "counterparty_legal_address_line_2",
+                "counterparty_legal_district",
+                "counterparty_legal_city",
+                "counterparty_legal_postal_code",
+                "counterparty_legal_country",
+                "counterparty_legal_phone_number",
+            ]
         ]
-    ]
+    except KeyError as e:
+        raise KeyError(f"Missing required columns: {e}")
 

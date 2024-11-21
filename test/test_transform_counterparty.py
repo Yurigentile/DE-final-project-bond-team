@@ -1,5 +1,6 @@
 import pandas as pd
 from transform_lambda.src.transform_counterparty import transform_counterparty
+import pytest
 
 def test_transform_counterparty():
     input_counterparty_df = pd.DataFrame([
@@ -108,3 +109,28 @@ def test_transform_counterparty():
     ])
     transformed_df = transform_counterparty(input_counterparty_df, input_address_df)
     pd.testing.assert_frame_equal(transformed_df, expected_df)
+
+def test_transform_counterparty_if_empty_df():
+    input_df_1 = pd.DataFrame()
+    input_df_2 = pd.DataFrame()
+    expected_df = pd.DataFrame()
+    
+    transformed_df = transform_counterparty(input_df_1, input_df_2)
+    pd.testing.assert_frame_equal(transformed_df, expected_df)
+
+def test_transform_design_if_invalid_df_were_given():
+    input_df_1 = pd.DataFrame([
+        {
+            "invalid_column": 472,
+            "invalid_column": 123
+        }
+    ])
+    input_df_2 = pd.DataFrame([
+        {
+            "invalid_column": 472,
+            "invalid_column": 123
+        }
+    ])
+    
+    with pytest.raises(KeyError, match="Missing required columns"):
+        transform_counterparty(input_df_1,input_df_2)
