@@ -32,7 +32,7 @@ class TestS3Save(unittest.TestCase):
         self.assertEqual(saved_data, data)
         self.assertEqual(response["ContentType"], "application/json")
         mock_print.assert_called_with(f"Saved to {bucket}/{key}")
-    
+
     @patch("builtins.print")
     @patch("boto3.client")
     def test_s3_save_error_handling(self, mock_boto_client, mock_print):
