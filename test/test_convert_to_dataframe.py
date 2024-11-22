@@ -57,6 +57,14 @@ data = {
     ],
 }
 
+<<<<<<< HEAD
+def test_multiple_json():
+    datadict = {"data1" : data, "data2" : data}
+    dataframe = convert_json_to_dataframe(datadict)
+    
+    assert type(dataframe["data1"]) == pd.core.frame.DataFrame
+    assert type(dataframe["data2"]) == pd.core.frame.DataFrame
+=======
 
 def xtest_data_type_converted_json():
     output_dataframe = convert_dictionary_to_dataframe(data)
@@ -74,3 +82,4 @@ class TestExceptions(unittest.TestCase):
         with self.assertRaises(Exception) as detail:
             convert_dictionary_to_dataframe("invalid_input")
             self.assertEqual(str(detail.exception))
+>>>>>>> 74a92a3ea9fb8e18ea27438dfcd0b490ea62d244
