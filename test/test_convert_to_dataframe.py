@@ -43,5 +43,6 @@ def xtest_data_type_converted_json():
 def test_multiple_json():
     datadict = {"data1" : data, "data2" : data}
     dataframe = convert_json_to_dataframe(datadict)
+    
     assert type(dataframe["data1"]) == pd.core.frame.DataFrame
     assert type(dataframe["data2"]) == pd.core.frame.DataFrame
