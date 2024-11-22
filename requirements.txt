@@ -17,7 +17,7 @@ charset-normalizer==3.4.0
 click==8.1.7
 coverage==7.6.4
 cryptography==43.0.3
-currency_codes== 2.2.0
+currency_codes== 23.6.4
 docker==7.1.0
 dparse==0.6.4
 filelock==3.12.4
