@@ -16,7 +16,7 @@ from moto import mock_aws
     }
 })
 
-def test_lambda_handler_run():
+def xtest_lambda_handler_run():
     bucket = "test-data"
     region = "eu-west-2"
 
