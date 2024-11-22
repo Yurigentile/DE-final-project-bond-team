@@ -3,6 +3,10 @@ data "aws_cloudwatch_log_group" "ingestion_lambda_log_group" {
   name = "/aws/lambda/extract"
 }
 
+data "aws_cloudwatch_log_group" "transform_lambda_log_group" {
+  name = "/aws/lambda/transform"
+}
+
 #metric filters
 resource "aws_cloudwatch_log_metric_filter" "error_metric_filter_ingest" {
   name           = "IngestionLogErrorFilter"
@@ -87,4 +91,49 @@ resource "aws_cloudwatch_metric_alarm" "runtimeerror_alert_ingest" {
   threshold           = 1
   alarm_description   = "This metric monitors number of run time errors coming from the Ingestion Lambda in 2 minutes intervals"
   alarm_actions       = [aws_sns_topic.notifications.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "transform_errors" {
+  alarm_name          = "transform_errors_alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  dimensions = {
+    FunctionName = aws_lambda_function.transform_handler.function_name
+  }
+  alarm_actions = [aws_sns_topic.notifications.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "transform_duration" {
+  alarm_name          = "transform_duration_alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Duration"
+  namespace           = "AWS/Lambda"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "120000"
+  dimensions = {
+    FunctionName = aws_lambda_function.transform_handler.function_name
+  }
+  alarm_actions = [aws_sns_topic.notifications.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "transform_throttles" {
+  alarm_name          = "transform_throttles_alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Throttles"
+  namespace           = "AWS/Lambda"
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  dimensions = {
+    FunctionName = aws_lambda_function.transform_handler.function_name
+  }
+  alarm_actions = [aws_sns_topic.notifications.arn]
 }
