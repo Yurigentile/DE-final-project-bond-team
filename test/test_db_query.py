@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 # TODO: unskip when test DB is ready
 
 
-def xtest_get_latest_data():
+def test_get_latest_data():
     secret = get_secret("totes-database")
     conn = create_conn(secret)
     tables = [
@@ -31,7 +31,7 @@ def xtest_get_latest_data():
     )  # TODO: # Test query results on test database (filtered data by last update)
 
 
-def xtest_get_latest_data_returns_empty_tables_for_the_future_date():
+def test_get_latest_data_returns_empty_tables_for_the_future_date():
     secret = get_secret("totes-database")
     conn = create_conn(secret)
     tables = [
