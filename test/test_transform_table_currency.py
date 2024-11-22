@@ -1,4 +1,4 @@
-from transform_table_currency import transform_currency
+from transform_lambda.src.transform_table_currency import transform_currency
 import pandas as pd
 
 def test_transform_table_with_single_currency():

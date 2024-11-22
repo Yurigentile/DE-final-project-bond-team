@@ -1,4 +1,4 @@
-from transform_sales_order import transform_sales_order
+from transform_lambda.src.transform_sales_order import transform_sales_order
 import pandas as pd
 from datetime import date,time
 from decimal import Decimal

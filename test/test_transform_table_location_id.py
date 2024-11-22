@@ -1,4 +1,4 @@
-from transform_table_location_id import transform_location
+from transform_lambda.src.transform_table_location_id import transform_location
 import pandas as pd
 
 def test_transform_table_location_id():
