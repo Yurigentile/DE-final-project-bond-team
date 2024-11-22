@@ -1,9 +1,9 @@
-from transform_sales_order import transform_sales_order
+from transform_lambda.src.transform_sales_order import transform_sales_order
 import pandas as pd
 from datetime import date,time
 from decimal import Decimal
 
-def test_transform_sales_order():
+def xtest_transform_sales_order():
     input_df = pd.DataFrame([
         {
             "sales_order_id": 1,

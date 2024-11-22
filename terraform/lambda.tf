@@ -64,3 +64,47 @@ resource "aws_lambda_function" "extract_handler" {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+############################### TRANSFORM LAMBDA ##############################
+
+#Zipping handler function
+data "archive_file" "transform_lambda" {
+  type             = "zip"
+  output_file_mode = "0666"
+  source_dir      = "${path.module}/../transform_lambda"
+  output_path      = "${path.module}/../transform_lambda.zip"
+}
+
+#Uploading them to the code S3 bucket
+resource "aws_s3_object" "file_upload_transform_lambda" {
+  bucket = "${aws_s3_bucket.processed.id}"
+  key    = "lambda-functions/transform_lambda.zip"
+  source = "${path.module}/../transform_lambda.zip"
+}
+
+############################## Double check handler after it's ready ####################################
+#Deploying lambda function
+resource "aws_lambda_function" "transform_handler" {
+  s3_bucket     = aws_s3_bucket.code.bucket
+  s3_key        = "lambda-functions/transform_lambda.zip"
+  function_name = "transform"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "handler.transform_lambda_handler"
+  runtime       = var.python_runtime
+  timeout       = 120
+  layers = [
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:14"
+  ]
+  source_code_hash = data.archive_file.transform_lambda.output_base64sha256
+
+} 
