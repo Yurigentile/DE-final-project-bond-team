@@ -1,4 +1,4 @@
-from currency_codes import get_currency_by_code
+#from currency_codes import get_currency_by_code
 
 
 
@@ -12,5 +12,5 @@ def transform_currency(df):
 '''
     dim_currency = df.copy()
     currency_codes = list(dim_currency['currency_code'])
-    dim_currency['currency_name'] = [get_currency_by_code(code).name for code in currency_codes]
+    #dim_currency['currency_name'] = [get_currency_by_code(code).name for code in currency_codes]
     return dim_currency[['currency_id','currency_code','currency_name']]
