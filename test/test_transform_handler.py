@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from transform_lambda.transform_handler import lambda_handler, transform_function
+from transform_lambda.transform_handler import lambda_handler
 import pandas as pd
 
 data_json = [
