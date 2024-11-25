@@ -3,9 +3,11 @@ data "aws_cloudwatch_log_group" "ingestion_lambda_log_group" {
   name = "/aws/lambda/extract"
 }
 
+
 data "aws_cloudwatch_log_group" "transform_lambda_log_group" {
   name = "/aws/lambda/transform"
 }
+
 
 #metric filters
 resource "aws_cloudwatch_log_metric_filter" "error_metric_filter_ingest" {

@@ -208,7 +208,7 @@ def test_transform_sales_order():
     input_df = pd.DataFrame([
         {
             "sales_order_id": 1,
-            "created_at": "2022-11-03 14:20:52.186",
+            "created_at": "2022-11-03T14:20:52.186",
             "last_updated": "2022-11-03 14:20:52.186",
             "design_id": 2,
             "staff_id": 19,
@@ -222,7 +222,7 @@ def test_transform_sales_order():
         },
         {
             "sales_order_id": 2,
-            "created_at": "2022-11-03 14:20:52.188",
+            "created_at": "2022-11-03T14:20:52.188",
             "last_updated": "2022-11-03 14:20:52.188",
             "design_id": 3,
             "staff_id": 10,
