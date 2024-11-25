@@ -8,4 +8,5 @@ __pycache__
 create_layer
 dependencies.zip
 extract_lambda.zip
+transform_lambda.zip
 extract_layer/python/lib/python3.12/site-packages

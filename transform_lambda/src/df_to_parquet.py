@@ -24,9 +24,10 @@ def convert_dataframe_to_parquet(table_name, table_df, bucket):
         >>> convert_dataframe_to_parquet('example_table', dataframe, 'example-bucket')
         Print - Saved to s3://{bucket-name/timestamp/table-name}.parquet
     """
+    
     try:
         # creates current timestamp for s3 file name
-        current_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
 
         # set the desired location for the parquet file
         path = f"s3://{bucket}/{current_timestamp}/{table_name}.parquet"
@@ -36,5 +37,4 @@ def convert_dataframe_to_parquet(table_name, table_df, bucket):
 
         print('Added to bucket: ', output)
     except Exception as e:
-        print(f"Error: {e}")
-        raise e
+        print(f"Error processing {table_name}: {e}")
