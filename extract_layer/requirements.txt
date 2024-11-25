@@ -1,4 +1,5 @@
 asn1crypto==1.5.1
+currency-codes==23.6.4
 pg8000==1.31.2
 python-dateutil==2.9.0.post0
 scramp==1.4.5

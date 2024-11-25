@@ -87,7 +87,7 @@ data "archive_file" "transform_lambda" {
 
 #Uploading them to the code S3 bucket
 resource "aws_s3_object" "file_upload_transform_lambda" {
-  bucket = "${aws_s3_bucket.processed.id}"
+  bucket = "${aws_s3_bucket.code.id}"
   key    = "lambda-functions/transform_lambda.zip"
   source = "${path.module}/../transform_lambda.zip"
 }
@@ -99,11 +99,12 @@ resource "aws_lambda_function" "transform_handler" {
   s3_key        = "lambda-functions/transform_lambda.zip"
   function_name = "transform"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "handler.transform_lambda_handler"
+  handler       = "transform_handler.lambda_handler"
   runtime       = var.python_runtime
   timeout       = 120
   layers = [
-    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:14"
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:14",
+    aws_lambda_layer_version.requests_layer_dependencies.arn
   ]
   source_code_hash = data.archive_file.transform_lambda.output_base64sha256
 
