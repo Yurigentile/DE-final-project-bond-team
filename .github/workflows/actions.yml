@@ -78,6 +78,15 @@ jobs:
         echo "AWS_DEFAULT_REGION=eu-west-2"
         echo "AWS_SESSION_TOKEN=testing"
         echo "AWS_SECURITY_TOKEN=testing"
+
+#Setup variables for test database
+    - name: Set environment variables for test database connection
+      run: |
+        echo "DB_NAME=test_database"
+        echo "DB_USER=test_user"
+        echo "DB_HOST=localhost"
+        echo "DB_PORT=5432"
+        echo "DB_PASSWORD=test"   
   
 # Run pytest
     - name: Test with pytest
