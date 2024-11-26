@@ -11,7 +11,7 @@ from load_lambda.src.warehouse_load_functions import get_secret, alchemy_db_conn
 class TestGetSecret(unittest.TestCase):
     def setUp(self):
         # Set up a mock AWS Secrets Manager
-        self.client = boto3.client("secretsmanager")
+        self.client = boto3.client("secretsmanager", region_name = 'eu-west-2')
         self.secret_name = "test-secret"
         self.secret_value = {"username": "admin", "password": "password123"}
         self.client.create_secret(
