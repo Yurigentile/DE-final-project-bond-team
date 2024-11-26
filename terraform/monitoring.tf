@@ -3,10 +3,13 @@ data "aws_cloudwatch_log_group" "ingestion_lambda_log_group" {
   name = "/aws/lambda/extract"
 }
 
-
 data "aws_cloudwatch_log_group" "transform_lambda_log_group" {
   name = "/aws/lambda/transform"
 }
+
+# data "aws_cloudwatch_log_group" "transform_lambda_log_group" {
+#   name = "/aws/lambda/load"
+# }
 
 
 #metric filters
@@ -136,6 +139,54 @@ resource "aws_cloudwatch_metric_alarm" "transform_throttles" {
   threshold           = "1"
   dimensions = {
     FunctionName = aws_lambda_function.transform_handler.function_name
+  }
+  alarm_actions = [aws_sns_topic.notifications.arn]
+}
+
+
+
+
+resource "aws_cloudwatch_metric_alarm" "load_errors" {
+  alarm_name          = "load_errors_alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  dimensions = {
+    FunctionName = aws_lambda_function.load_handler.function_name
+  }
+  alarm_actions = [aws_sns_topic.notifications.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "load_duration" {
+  alarm_name          = "load_duration_alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Duration"
+  namespace           = "AWS/Lambda"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "120000"
+  dimensions = {
+    FunctionName = aws_lambda_function.load_handler.function_name
+  }
+  alarm_actions = [aws_sns_topic.notifications.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "load_throttles" {
+  alarm_name          = "load_throttles_alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Throttles"
+  namespace           = "AWS/Lambda"
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  dimensions = {
+    FunctionName = aws_lambda_function.load_handler.function_name
   }
   alarm_actions = [aws_sns_topic.notifications.arn]
 }
