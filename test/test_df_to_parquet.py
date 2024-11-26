@@ -2,6 +2,7 @@ from transform_lambda.src.df_to_parquet import convert_dataframe_to_parquet
 from transform_lambda.src.convert_to_dataframe import convert_dictionary_to_dataframe
 import pytest
 from unittest.mock import patch
+import unittest
 
 test_dict = {'address': [],
 
@@ -60,6 +61,8 @@ class TestDfToParuqet:
         # check mock was called correctly
         mock_df_to_parquet.assert_called_once()
 
+class TestException(unittest.TestCase):
+
     @patch('transform_lambda.src.df_to_parquet.wr.s3.to_parquet')
     def test_function_raises_exception_for_invalid_bucket(self, mock_to_parquet):
 
@@ -70,7 +73,8 @@ class TestDfToParuqet:
         test_df_dict = convert_dictionary_to_dataframe(test_dict)
 
         # invoke function
-        with pytest.raises(Exception) as err:   
-            output = convert_dataframe_to_parquet('payment', test_df_dict['payment'], 'test_bucket')
-        assert "NoSuchBucket" in str(err.value)
+        with self.assertRaises(Exception) as context:
+            convert_dataframe_to_parquet('payment', test_df_dict['payment'], 'test_bucket')
+        self.assertTrue('NoSuchBucket' in str(context.exception))
+
         
