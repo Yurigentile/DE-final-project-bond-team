@@ -36,7 +36,7 @@ def retrive_list_of_files(bucket):
     return []
 
 
-def load_parquet_data(bucket):
+def read_parquet_data_to_dataframe(bucket):
     """
     Retrives data from objects in s3 bucket and reads them to DataFrame
 
@@ -51,7 +51,7 @@ def load_parquet_data(bucket):
         A dictionary, where each key represents table and value represents a parquet file converted to DataFrame.
 
     Example:
-        >>> load_parquet_data('my-bucket')
+        >>> read_parquet_data_to_dataframe('my-bucket')
             {'dim_design':    design_id design_name file_location                  file_name
                 0        477      Bronze          /lib  bronze-20230409-joj9.json,
             'dim_date':       date_id  year  month  day  day_of_week   day_name month_name  quarter
