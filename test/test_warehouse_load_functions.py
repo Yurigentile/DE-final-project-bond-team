@@ -1,10 +1,11 @@
 import boto3
 import json
 import unittest
+import pandas as pd
 from unittest.mock import patch, MagicMock
 from moto import mock_aws
 from botocore.exceptions import ClientError
-from load_lambda.src.warehouse_load_functions import get_secret, alchemy_db_connection
+from load_lambda.src.warehouse_load_functions import get_secret, alchemy_db_connection, alchemy_close_connection, load_data_into_warehouse
 
 @mock_aws
 class TestGetSecret(unittest.TestCase):
@@ -98,7 +99,96 @@ class TestAlchemyDBConnection(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             alchemy_db_connection('test_secret')
 
-        self.assertTrue('Connection error' in str(context.exception))        
+        self.assertTrue('Connection error' in str(context.exception))
+
+class TestAlchemyCloseConnection(unittest.TestCase):    
+    def setUp(self):
+        # Create a mock engine
+        self.mock_engine = MagicMock()
+        self.logger = MagicMock()
+    
+    @patch('load_lambda.src.warehouse_load_functions.logger')
+    def test_close_connection_success(self, mock_logger):
+        # Create a mock engine
+        mock_engine = MagicMock()
+        mock_engine.dispose = MagicMock()
+        
+        # Call the function
+        alchemy_close_connection(mock_engine)
+
+        # Assert that dispose() was called on the engine
+        mock_engine.dispose.assert_called_once()
+
+        # Assert that logger.info was called with the expected message
+        mock_logger.info.assert_called_with("Database connection engine closed")
+    
+    def test_close_connection_no_engine(self):
+        # Test behavior when no engine is passed
+        alchemy_close_connection(None)
+        
+        # Since no engine is provided, we expect dispose() not to be called
+        self.mock_engine.dispose.assert_not_called()
+    
+    @patch('load_lambda.src.warehouse_load_functions.logger')
+    def test_close_connection_exception(self, mock_logger):
+        # Simulate an exception in dispose
+        mock_engine = MagicMock()
+        mock_engine.dispose.side_effect = Exception("Dispose failed")
+        
+        # Call the function
+        alchemy_close_connection(mock_engine)
+        
+        # Check that the logger.error was called with the exception message
+        mock_logger.error.assert_called_with("Error closing engine connection: Dispose failed")
+
+class TestLoadDataIntoWarehouse(unittest.TestCase):
+    @patch('load_lambda.src.warehouse_load_functions.alchemy_db_connection')
+    @patch('load_lambda.src.warehouse_load_functions.logger')
+    def test_load_data_into_warehouse_success(self, mock_logger, mock_db_connection):
+        # Arrange
+        db_params = {'host': 'localhost', 'user': 'user', 'password': 'password', 'database': 'test_db'}
+        dataframes = {
+            'table1': pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]}),
+            'table2': pd.DataFrame({'col1': [5, 6], 'col2': [7, 8]})
+        }
+        mock_engine = MagicMock()
+        mock_db_connection.return_value = mock_engine
+        
+        # Mock the to_sql method of the DataFrame to avoid actual database operations
+        with patch.object(pd.DataFrame, 'to_sql', return_value=None) as mock_to_sql:
+            # Act
+            load_data_into_warehouse(dataframes, db_params)
+            
+            # Assert that the to_sql method is called with the correct arguments
+            mock_to_sql.assert_any_call(name='table1', con=mock_engine, schema='public', if_exists='append', index=False)
+            mock_to_sql.assert_any_call(name='table2', con=mock_engine, schema='public', if_exists='append', index=False)
+            
+            # Assert logger calls for success
+            mock_logger.info.assert_any_call("Loading table: table1 (Rows: 2)")
+            mock_logger.info.assert_any_call("Successfully loaded table: table1")
+            mock_logger.info.assert_any_call("Loading table: table2 (Rows: 2)")
+            mock_logger.info.assert_any_call("Successfully loaded table: table2")
+
+    @patch('load_lambda.src.warehouse_load_functions.alchemy_db_connection')
+    @patch('load_lambda.src.warehouse_load_functions.logger')
+    def test_load_data_into_warehouse_failure(self, mock_logger, mock_db_connection):
+        # Arrange
+        db_params = {'host': 'localhost', 'user': 'user', 'password': 'password', 'database': 'test_db'}
+        dataframes = {
+            'table1': pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]}),
+            'table2': pd.DataFrame({'col1': [5, 6], 'col2': [7, 8]})
+        }
+        mock_engine = MagicMock()
+        mock_db_connection.return_value = mock_engine
+        
+        # Simulate an exception during the loading of the DataFrame
+        with patch.object(pd.DataFrame, 'to_sql', side_effect=Exception("Database error")):
+            # Act
+            load_data_into_warehouse(dataframes, db_params)
+            
+            # Assert that the logger recorded the error
+            mock_logger.error.assert_any_call("Failed to load table table1: Database error")
+            mock_logger.error.assert_any_call("Failed to load table table2: Database error")              
 
 if __name__ == "__main__":
     unittest.main()
