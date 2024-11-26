@@ -75,7 +75,7 @@ jobs:
       run: |
         echo "AWS_ACCESS_KEY_ID=fake-access-key-id"
         echo "AWS_SECRET_ACCESS_KEY=fake-secret-access-key"
-        export "AWS_DEFAULT_REGION=eu-west-2"
+        echo "AWS_DEFAULT_REGION=eu-west-2"
         echo "AWS_SESSION_TOKEN=testing"
         echo "AWS_SECURITY_TOKEN=testing"
   
