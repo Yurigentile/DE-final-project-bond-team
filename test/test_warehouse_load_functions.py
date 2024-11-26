@@ -1,13 +1,12 @@
 import boto3
 import json
+from moto import mock_aws
 import unittest
 import pandas as pd
 from unittest.mock import patch, MagicMock
-from moto import mock_aws
 from botocore.exceptions import ClientError
 from load_lambda.src.warehouse_load_functions import get_secret, alchemy_db_connection, alchemy_close_connection, load_data_into_warehouse
 
-@mock_aws
 class TestGetSecret(unittest.TestCase):
     def setUp(self):
         # Set up a mock AWS Secrets Manager
@@ -18,18 +17,20 @@ class TestGetSecret(unittest.TestCase):
             Name=self.secret_name,
             SecretString=json.dumps(self.secret_value),
         )
-    
+    @mock_aws
     def test_get_secret_success(self):
         # Test successful retrieval of the secret
         result = get_secret(self.secret_name)
         self.assertIsInstance(result, dict, "Secret should be a dictionary")
         self.assertEqual(result, self.secret_value, "Secret value does not match expected")
 
+    @mock_aws
     def test_get_secret_not_found(self):
         # Test retrieving a non-existent secret
         result = get_secret("non-existent-secret")
         self.assertIsNone(result, "Should return None for non-existent secret")
     
+    @mock_aws
     def test_get_secret_invalid_json(self):
         # Test when the secret is not valid JSON
         invalid_secret_name = "invalid-secret"
