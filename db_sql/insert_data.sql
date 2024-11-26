@@ -32,3 +32,11 @@ INSERT INTO reviews (user_id, product_id, rating, comment) VALUES
 (2, 3, 3, 'Average keyboard.'),
 (3, 4, 5, 'Love the monitor! Crystal clear.'),
 (3, 5, 4, 'Headphones are solid.');
+
+INSERT INTO design (design_id, created_at, design_name, file_location, file_name, last_updated) VALUES
+(472, '2024-11-14T09:41:09.839000', 'Concrete', '/usr/share', 'concrete-20241026-76vi.json', '2024-11-14T09:41:09.839000'),
+(473, '2024-11-15T14:09:09.608000', 'Rubber', '/Users', 'rubber-20240916-1hsu.json', '2024-11-15T14:09:09.608000');
+
+INSERT INTO sales_order (sales_order_id, created_at, last_updated, design_id, staff_id, counterparty_id, units_sold, unit_price, currency_id, agreed_delivery_date, agreed_payment_date, agreed_delivery_location_id) VALUES
+(11165, '2024-11-14T10:19:09.990000', '2024-11-14T10:19:09.990000', 472, 18, 19, 12145, 3.83, 3, '2024-11-15', '2024-11-15', 26),
+(11166, '2024-11-14T11:36:10.342000', '2024-11-14T11:36:10.342000', 473, 14, 20, 75609, 3.52, 3, '2024-11-15', '2024-11-20', 7);
