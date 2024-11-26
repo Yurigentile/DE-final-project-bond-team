@@ -1,8 +1,6 @@
 import unittest
-from unittest.mock import patch, Mock, MagicMock
-import json
-from load_lambda.src.load_parquet_data import read_parquet_data_to_dataframe, retrive_list_of_files
-from botocore.exceptions import NoCredentialsError, ClientError
+from unittest.mock import patch
+from load_lambda.src.load_parquet_data import read_parquet_data_to_dataframe
 import pandas as pd
 
 
