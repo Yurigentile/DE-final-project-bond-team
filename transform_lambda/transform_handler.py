@@ -31,11 +31,16 @@ else:
     transform_location
 ) 
 
-# EVENT/CONTEXT
-    # triggered off previous lambda function's completion
-    # event includes data bucket name and processed bucket name
-
 def lambda_handler(event, context):
+    """
+    AWS Lambda Handler to retrieve JSON files from an S3 bucket, convert them into DataFrames, Transform them into a star schema using Pandas, and save to a different S3 Bucket in Parquet format
+
+    Event Format:
+        {
+            "data_bucket": "bucket-name"
+            "processed_bucket": "bucket-name"
+        }
+    """
     try:
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)

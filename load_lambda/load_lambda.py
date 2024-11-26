@@ -26,7 +26,7 @@ def lambda_handler(event, context):
         data = read_parquet_data_to_dataframe(bucket)
 
         # Retrieve secret, create db connection and load dataframes into warehouse
-        load_data_into_warehouse(data, secret)
+        # load_data_into_warehouse(data, secret)
 
     except Exception as e:
         print(f"Error: {e}")
