@@ -22,7 +22,7 @@ def get_secret(name):
     Returns:
       Dictionary containing the secret or None if not found.
     """
-    secretsmanager_client = boto3.client("secretsmanager")
+    secretsmanager_client = boto3.client("secretsmanager", region_name = 'eu-west-2')
     
     try:
         logger.info(f"Retrieving: {name}")
@@ -139,4 +139,4 @@ def load_data_into_warehouse(dataframes, db_params, schema='public'):
             logger.info(f"Successfully loaded table: {table}")
         
         except Exception as load_error:
-            logger.error(f"Failed to load table {table}: {load_error}")   
+            logger.error(f"Failed to load table {table}: {load_error}") 
