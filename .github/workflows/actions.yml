@@ -77,7 +77,7 @@ jobs:
         echo "AWS_SECRET_ACCESS_KEY=fake-secret-access-key"
         echo "AWS_DEFAULT_REGION=eu-west-2"
         echo "AWS_SESSION_TOKEN=testing"
-        echo "AWS_SECURITY_TOKEN=testing"   
+        echo "AWS_SECURITY_TOKEN=testing"
   
 # Run pytest
     - name: Test with pytest
