@@ -1,20 +1,20 @@
 resource "aws_cloudwatch_event_rule" "scheduler" {
-  name        = "run-extract-lambda-every-15-mins"
-  description = "Runs quotes.py lambda on 15 min intervals"
-  schedule_expression = "rate(15 minutes)"
+  name        = "run-state-machine-every-20-mins"
+  description = "Runs step function on 20 min intervals"
+  schedule_expression = "rate(20 minutes)"
 }
 
-resource "aws_cloudwatch_event_target" "extract_lambda_target_resource" {
+resource "aws_cloudwatch_event_target" "state_machine_target_resource" {
     rule = aws_cloudwatch_event_rule.scheduler.name
-    target_id = "extract_lambda"
-    arn = aws_lambda_function.extract_handler.arn
-    input = var.extract_event
+    target_id = "state_machine"
+    arn = aws_sfn_state_machine.sfn_state_machine.arn
+    role_arn  = aws_iam_role.eventsbridge_invoke_step_functions.arn
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_run_extract_lambda" {
-    statement_id = "AllowExecutionFromCloudWatch"
-    action = "lambda:InvokeFunction"
-    function_name = aws_lambda_function.extract_handler.function_name
-    principal = "events.amazonaws.com"
-    source_arn = aws_cloudwatch_event_rule.scheduler.arn
-}
+# resource "aws_lambda_permission" "allow_cloudwatch_to_run_extract_lambda" {
+#     statement_id = "AllowExecutionFromCloudWatch"
+#     action = "lambda:InvokeFunction"
+#     function_name = aws_lambda_function.extract_handler.function_name
+#     principal = "states.amazonaws.com"
+#     source_arn = aws_sfn_state_machine.sfn_state_machine.arn
+# }
