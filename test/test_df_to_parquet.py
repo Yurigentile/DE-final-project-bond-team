@@ -62,9 +62,9 @@ class TestDfToParuqet:
         mock_df_to_parquet.assert_called_once()
 
 class TestException(unittest.TestCase):
-
     @patch('transform_lambda.src.df_to_parquet.wr.s3.to_parquet')
-    def test_function_raises_exception_for_invalid_bucket(self, mock_to_parquet):
+    @patch('builtins.print')
+    def test_function_raises_exception_for_invalid_bucket(self, mock_print, mock_to_parquet):
 
         # mock exception
         mock_to_parquet.side_effect = Exception("NoSuchBucket")
@@ -72,9 +72,12 @@ class TestException(unittest.TestCase):
         # convert dictionary to DataFrame using util function
         test_df_dict = convert_dictionary_to_dataframe(test_dict)
 
-        # invoke function
-        with self.assertRaises(Exception) as context:
-            convert_dataframe_to_parquet('payment', test_df_dict['payment'], 'test_bucket')
-        self.assertTrue('NoSuchBucket' in str(context.exception))
+        # invoke function            
+        convert_dataframe_to_parquet('payment', test_df_dict['payment'], 'test_bucket')
+
+        # assertion
+        mock_print.assert_any_call("Error processing payment: NoSuchBucket")
+
+
 
         
