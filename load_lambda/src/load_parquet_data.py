@@ -38,44 +38,27 @@ def retrive_list_of_files(bucket):
 
 def load_parquet_data(bucket):
     """
-    Retrives data from objects in s3 bucket.
+    Retrives data from objects in s3 bucket and reads them to DataFrame
 
     This function retrieves and returns the dictionary with all last updated objects
-    stored in the specified Amazon S3 bucket.
+    stored in the specified Amazon S3 bucket in DataFrame format.
 
     Parameters:
         bucket_name (str): The name of the S3 bucket to retrieve file names from.
-        tables (str): List of table names to query from the db
+        tables (str): List of table names which are to be added to data warehouse
 
     Returns:
-        A dictionary, where each key represents table and value represents list of dictionaries.
-        The nested list represents queried database rows.
+        A dictionary, where each key represents table and value represents a parquet file converted to DataFrame.
 
     Example:
-        >>> load_new_data('my-bucket')
-        {'address': [],
-            'sales_order': [{'agreed_delivery_date': '2024-11-24',
-                            'agreed_delivery_location_id': 8,
-                            'agreed_payment_date': '2024-11-19',
-                            'counterparty_id': 12,
-                            'created_at': '2024-11-19T14:26:09.927000',
-                            'currency_id': 3,
-                            'design_id': 140,
-                            'last_updated': '2024-11-19T14:26:09.927000',
-                            'sales_order_id': 11235,
-                            'staff_id': 5,
-                            'unit_price': 3.96,
-                            'units_sold': 77240}],
-            'staff': [],
-            'transaction': [{'created_at': '2024-11-19T14:26:09.927000',
-                            'last_updated': '2024-11-19T14:26:09.927000',
-                            'purchase_order_id': None,
-                            'sales_order_id': 11235,
-                            'transaction_id': 15903,
-                            'transaction_type': 'SALE'}]}
+        >>> load_parquet_data('my-bucket')
+            {'dim_design':    design_id design_name file_location                  file_name
+                0        477      Bronze          /lib  bronze-20230409-joj9.json,
+            'dim_date':       date_id  year  month  day  day_of_week   day_name month_name  quarter
+                0  2024-11-19  2024     11   19            1    Tuesday   November        4}
 
     Raises:
-        Exception: Any exception raised by boto3's put_object function will be caught, printed, and re-raised.
+        Exception: Any exception raised will be caught, printed, and re-raised.
     """
 
     tables = [
