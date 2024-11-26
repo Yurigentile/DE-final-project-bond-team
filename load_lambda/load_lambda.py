@@ -17,7 +17,7 @@ else:
 def lambda_handler(event, context):
     try:
         logger = logging.getLogger()
-        logger.setLevel(logging.INFO)   
+        logger.setLevel(logging.INFO)
 
         secret = event.get("secret")
         bucket = event.get("bucket")

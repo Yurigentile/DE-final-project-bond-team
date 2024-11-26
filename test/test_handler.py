@@ -7,15 +7,14 @@ from decimal import Decimal
 from moto import mock_aws
 
 
-@mock_aws(config={
-    "core": {
-        "mock_credentials": False,
-        "passthrough": {
-            "services": ["secretsmanager"]
+@mock_aws(
+    config={
+        "core": {
+            "mock_credentials": False,
+            "passthrough": {"services": ["secretsmanager"]},
         }
     }
-})
-
+)
 def xtest_lambda_handler_run():
     bucket = "test-data"
     region = "eu-west-2"
