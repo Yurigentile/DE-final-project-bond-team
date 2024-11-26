@@ -6,9 +6,26 @@ on:
   pull_request:
     branches: [ "main" ]
 
+    
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: test_database
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     
     steps:
     - uses: actions/checkout@v4
@@ -21,6 +38,38 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    # Wait for PostgreSQL to be ready
+    - name: Wait for PostgreSQL to be ready
+      run: |
+        until pg_isready -h localhost -p 5432 -U test_user; do
+          echo "Waiting for PostgreSQL to be ready..."
+          sleep 2
+        done
+      env:
+        PGPASSWORD: test
+
+    # Drop and create database
+    - name: Drop and create database
+      run: |
+        psql -h localhost -p 5432 -U test_user -d postgres -c "DROP DATABASE IF EXISTS test_database;"
+        psql -h localhost -p 5432 -U test_user -d postgres -c "CREATE DATABASE test_database;"
+      env:
+        PGPASSWORD: test
+
+    # Create tables
+    - name: Create tables
+      run: |
+        psql -h localhost -p 5432 -U test_user -d test_database -f db_sql/create_tables.sql
+      env:
+        PGPASSWORD: test
+
+    # Insert test data
+    - name: Insert test data
+      run: |
+        psql -h localhost -p 5432 -U test_user -d test_database -f db_sql/insert_data.sql
+      env:
+        PGPASSWORD: test    
+
 #Setup variables for moto testing
     - name: Set environment variables for mock AWS tests
       run: |
@@ -28,7 +77,7 @@ jobs:
         echo "AWS_SECRET_ACCESS_KEY=fake-secret-access-key"
         echo "AWS_DEFAULT_REGION=eu-west-2"
         echo "AWS_SESSION_TOKEN=testing"
-        echo "AWS_SECURITY_TOKEN=testing"
+        echo "AWS_SECURITY_TOKEN=testing"   
   
 # Run pytest
     - name: Test with pytest

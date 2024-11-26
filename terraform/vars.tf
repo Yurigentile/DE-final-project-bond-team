@@ -23,11 +23,6 @@ variable "python_runtime" {
   default = "python3.12"
 }
 
-variable "extract_event" {
-  type    = string
-  default = "{\"secret\": \"totes-database\",\"bucket\": \"nc-project-totes-data\"}"
-}
-
 
 
 

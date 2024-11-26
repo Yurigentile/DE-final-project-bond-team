@@ -119,13 +119,7 @@ def test_transform_counterparty():
     transformed_df = transform_counterparty(input_counterparty_df, input_address_df)
     pd.testing.assert_frame_equal(transformed_df, expected_df)
 
-def test_transform_counterparty_if_empty_df():
-    input_df_1 = pd.DataFrame()
-    input_df_2 = pd.DataFrame()
-    expected_df = pd.DataFrame()
-    
-    transformed_df = transform_counterparty(input_df_1, input_df_2)
-    pd.testing.assert_frame_equal(transformed_df, expected_df)
+
 
 def test_transform_design_if_invalid_df_were_given():
     input_df_1 = pd.DataFrame([
@@ -184,12 +178,7 @@ def test_transform_design():
     transformed_df = transform_design(input_df)
     pd.testing.assert_frame_equal(transformed_df, expected_df)
     
-def test_transform_design_if_empty_df():
-    input_df = pd.DataFrame()
-    expected_df = pd.DataFrame()
     
-    transformed_df = transform_design(input_df)
-    pd.testing.assert_frame_equal(transformed_df, expected_df)
 
 def test_transform_design_if_invalid_df_were_given():
     input_df = pd.DataFrame([

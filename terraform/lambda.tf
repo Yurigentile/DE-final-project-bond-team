@@ -60,21 +60,6 @@ resource "aws_lambda_function" "extract_handler" {
   source_code_hash = data.archive_file.lambda.output_base64sha256
 } 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ############################### TRANSFORM LAMBDA ##############################
 
 #Zipping handler function
@@ -92,7 +77,6 @@ resource "aws_s3_object" "file_upload_transform_lambda" {
   source = "${path.module}/../transform_lambda.zip"
 }
 
-############################## Double check handler after it's ready ####################################
 #Deploying lambda function
 resource "aws_lambda_function" "transform_handler" {
   s3_bucket     = aws_s3_bucket.code.bucket
@@ -101,11 +85,45 @@ resource "aws_lambda_function" "transform_handler" {
   role          = aws_iam_role.lambda_role.arn
   handler       = "transform_handler.lambda_handler"
   runtime       = var.python_runtime
-  timeout       = 120
+  timeout       = 240
   layers = [
     "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:14",
     aws_lambda_layer_version.requests_layer_dependencies.arn
   ]
   source_code_hash = data.archive_file.transform_lambda.output_base64sha256
+
+} 
+
+############################### LOAD LAMBDA ##############################
+
+#Zipping load function
+data "archive_file" "load_lambda" {
+  type             = "zip"
+  output_file_mode = "0666"
+  source_dir      = "${path.module}/../load_lambda"
+  output_path      = "${path.module}/../load_lambda.zip"
+}
+
+#Uploading them to the code S3 bucket
+resource "aws_s3_object" "file_upload_load_lambda" {
+  bucket = "${aws_s3_bucket.code.id}"
+  key    = "lambda-functions/load_lambda.zip"
+  source = "${path.module}/../load_lambda.zip"
+}
+
+#Deploying lambda function
+resource "aws_lambda_function" "load_handler" {
+  s3_bucket     = aws_s3_bucket.code.bucket
+  s3_key        = "lambda-functions/load_lambda.zip"
+  function_name = "load"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "load_handler.lambda_handler"
+  runtime       = var.python_runtime
+  timeout       = 240
+  layers = [
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:14",
+    aws_lambda_layer_version.requests_layer_dependencies.arn
+  ]
+  source_code_hash = data.archive_file.load_lambda.output_base64sha256
 
 } 
