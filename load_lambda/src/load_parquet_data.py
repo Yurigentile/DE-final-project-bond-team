@@ -30,7 +30,6 @@ def retrive_list_of_files(bucket):
     s3_client = boto3.client("s3")
     timestamp = datetime.now().strftime("%Y-%m-%d")
     response = s3_client.list_objects_v2(Bucket=bucket,Prefix=timestamp)
-
     if "Contents" in response:
         return [obj["Key"] for obj in response["Contents"]]
     return []
@@ -83,7 +82,7 @@ def read_parquet_data_to_dataframe(bucket):
                 result[table] = wr.s3.read_parquet(path=[f"s3://{bucket}/{last_sync_timestamp}/{table}.parquet"])
             except:
                 pass
-
+        
         return result
     except Exception as e:
         print(f"Error: {e}")
