@@ -13,13 +13,13 @@ def test_lambda_handler_run():
     bucket = "test-data"
     region = "eu-west-2"
 
-    boto3.client("s3", region_name = region).create_bucket(
+    boto3.client("s3", region_name=region).create_bucket(
         Bucket=bucket, CreateBucketConfiguration={"LocationConstraint": region}
     )
 
-    boto3.client("secretsmanager", region_name = region).create_secret(
+    boto3.client("secretsmanager", region_name=region).create_secret(
         Name=secret,
-        SecretString='{"user": "test_user", "password": "test", "host": "localhost", "database": "test_database", "port": 5432}'
+        SecretString='{"user": "test_user", "password": "test", "host": "localhost", "database": "test_database", "port": 5432}',
     )
 
     event = {
@@ -29,12 +29,18 @@ def test_lambda_handler_run():
 
     lambda_handler(event, None)
 
-    object_list = boto3.client("s3", region_name = region).list_objects_v2(Bucket=bucket)
+    object_list = boto3.client("s3", region_name=region).list_objects_v2(Bucket=bucket)
     # Unfortunately S3 doesn't allow to list objects by suffix, hence own filtering is required
-    matched_object = [obj for obj in object_list['Contents'] if obj['Key'].endswith('sales_order.json')][0]
+    matched_object = [
+        obj
+        for obj in object_list["Contents"]
+        if obj["Key"].endswith("sales_order.json")
+    ][0]
     object_key = matched_object["Key"]
 
-    object = boto3.client("s3", region_name = region).get_object(Bucket=bucket, Key=object_key)
+    object = boto3.client("s3", region_name=region).get_object(
+        Bucket=bucket, Key=object_key
+    )
     content = object["Body"].read().decode("utf-8")
 
     assert content == (
@@ -50,16 +56,23 @@ def test_lambda_handler_run():
         '"agreed_payment_date": "2024-11-20", "agreed_delivery_location_id": 7}]'
     )
 
-    matched_object = [obj for obj in object_list['Contents'] if obj['Key'].endswith('transaction.json')][0]
+    matched_object = [
+        obj
+        for obj in object_list["Contents"]
+        if obj["Key"].endswith("transaction.json")
+    ][0]
     object_key = matched_object["Key"]
 
-    object = boto3.client("s3", region_name = region).get_object(Bucket=bucket, Key=object_key)
+    object = boto3.client("s3", region_name=region).get_object(
+        Bucket=bucket, Key=object_key
+    )
     content = object["Body"].read().decode("utf-8")
 
-    assert content == '[]'
+    assert content == "[]"
 
     # TODO: Test second run
     # lambda_handler(event, None)
+
 
 def xtest_lambda_handler_upload_to_s3():
     """Test successful S3 upload scenario"""

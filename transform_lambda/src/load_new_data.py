@@ -30,7 +30,7 @@ def retrive_list_of_files(bucket):
 
     s3_client = boto3.client("s3")
     timestamp = datetime.now().strftime("%Y-%m-%d")
-    response = s3_client.list_objects_v2(Bucket=bucket,Prefix=timestamp)
+    response = s3_client.list_objects_v2(Bucket=bucket, Prefix=timestamp)
 
     if "Contents" in response:
         return [obj["Key"] for obj in response["Contents"]]
