@@ -35,7 +35,9 @@ create-user:
 		echo "User $(DB_USER) created successfully."; \
 	else \
 		echo "User $(DB_USER) already exists."; \
-	fi
+	fi;\
+	psql -h $(DB_HOST) -p $(DB_PORT) -U postgres -d $(ADMIN_DB) -c "ALTER ROLE $(DB_USER) WITH SUPERUSER CREATEROLE CREATEDB;"; \
+	echo "Roles and permissions updated for $(DB_USER)."
 
 # Rule to drop the database if it exists and create it
 .PHONY: drop-create-db

@@ -7,107 +7,59 @@ from decimal import Decimal
 from moto import mock_aws
 
 
-@mock_aws(config={
-    "core": {
-        "mock_credentials": False,
-        "passthrough": {
-            "services": ["secretsmanager"]
-        }
-    }
-})
-
-def xtest_lambda_handler_run():
+@mock_aws
+def test_lambda_handler_run():
+    secret = "test-secret"
     bucket = "test-data"
     region = "eu-west-2"
 
-    boto3.client("s3").create_bucket(
+    boto3.client("s3", region_name = region).create_bucket(
         Bucket=bucket, CreateBucketConfiguration={"LocationConstraint": region}
     )
 
+    boto3.client("secretsmanager", region_name = region).create_secret(
+        Name=secret,
+        SecretString='{"user": "test_user", "password": "test", "host": "localhost", "database": "test_database", "port": 5432}'
+    )
+
     event = {
-        "secret": "totes-database",
+        "secret": secret,
         "bucket": bucket,
     }
 
-    # TODO: Replace with test dataset when test database will appear
-    dataset_stub = {
-        "design": [
-            {
-                "design_id": 472,
-                "created_at": datetime(2024, 11, 14, 9, 41, 9, 839000),
-                "design_name": "Concrete",
-                "file_location": "/usr/share",
-                "file_name": "concrete-20241026-76vi.json",
-                "last_updated": datetime(2024, 11, 14, 9, 41, 9, 839000),
-            },
-            {
-                "design_id": 473,
-                "created_at": datetime(2024, 11, 15, 14, 9, 9, 608000),
-                "design_name": "Rubber",
-                "file_location": "/Users",
-                "file_name": "rubber-20240916-1hsu.json",
-                "last_updated": datetime(2024, 11, 15, 14, 9, 9, 608000),
-            },
-        ],
-        "sales_order": [
-            {
-                "sales_order_id": 11165,
-                "created_at": datetime(2024, 11, 14, 10, 19, 9, 990000),
-                "last_updated": datetime(2024, 11, 14, 10, 19, 9, 990000),
-                "design_id": 69,
-                "staff_id": 18,
-                "counterparty_id": 19,
-                "units_sold": 12145,
-                "unit_price": Decimal("3.83"),
-                "currency_id": 3,
-                "agreed_delivery_date": "2024-11-15",
-                "agreed_payment_date": "2024-11-15",
-                "agreed_delivery_location_id": 26,
-            },
-            {
-                "sales_order_id": 11166,
-                "created_at": datetime(2024, 11, 14, 11, 36, 10, 342000),
-                "last_updated": datetime(2024, 11, 14, 11, 36, 10, 342000),
-                "design_id": 398,
-                "staff_id": 14,
-                "counterparty_id": 20,
-                "units_sold": 75609,
-                "unit_price": Decimal("3.52"),
-                "currency_id": 3,
-                "agreed_delivery_date": "2024-11-15",
-                "agreed_payment_date": "2024-11-20",
-                "agreed_delivery_location_id": 7,
-            },
-        ],
-    }
+    lambda_handler(event, None)
 
-    # Patch boto3.client to return our mock
-    with patch("extract_lambda.handler.get_latest_data", return_value=dataset_stub):
-        # First run
-        lambda_handler(event, None)
+    object_list = boto3.client("s3", region_name = region).list_objects_v2(Bucket=bucket)
+    # Unfortunately S3 doesn't allow to list objects by suffix, hence own filtering is required
+    matched_object = [obj for obj in object_list['Contents'] if obj['Key'].endswith('sales_order.json')][0]
+    object_key = matched_object["Key"]
 
-    object_list = boto3.client("s3").list_objects_v2(Bucket=bucket)
-    last_object_key = object_list["Contents"][-1]["Key"]
-
-    object = boto3.client("s3").get_object(Bucket=bucket, Key=last_object_key)
+    object = boto3.client("s3", region_name = region).get_object(Bucket=bucket, Key=object_key)
     content = object["Body"].read().decode("utf-8")
 
     assert content == (
         '[{"sales_order_id": 11165, "created_at": "2024-11-14T10:19:09.990000", '
-        '"last_updated": "2024-11-14T10:19:09.990000", "design_id": 69, "staff_id": '
+        '"last_updated": "2024-11-14T10:19:09.990000", "design_id": 472, "staff_id": '
         '18, "counterparty_id": 19, "units_sold": 12145, "unit_price": 3.83, '
         '"currency_id": 3, "agreed_delivery_date": "2024-11-15", '
         '"agreed_payment_date": "2024-11-15", "agreed_delivery_location_id": 26}, '
         '{"sales_order_id": 11166, "created_at": "2024-11-14T11:36:10.342000", '
-        '"last_updated": "2024-11-14T11:36:10.342000", "design_id": 398, "staff_id": '
+        '"last_updated": "2024-11-14T11:36:10.342000", "design_id": 473, "staff_id": '
         '14, "counterparty_id": 20, "units_sold": 75609, "unit_price": 3.52, '
         '"currency_id": 3, "agreed_delivery_date": "2024-11-15", '
         '"agreed_payment_date": "2024-11-20", "agreed_delivery_location_id": 7}]'
     )
 
-    # Second run
-    # lambda_handler(event, None)
+    matched_object = [obj for obj in object_list['Contents'] if obj['Key'].endswith('transaction.json')][0]
+    object_key = matched_object["Key"]
 
+    object = boto3.client("s3", region_name = region).get_object(Bucket=bucket, Key=object_key)
+    content = object["Body"].read().decode("utf-8")
+
+    assert content == '[]'
+
+    # TODO: Test second run
+    # lambda_handler(event, None)
 
 def xtest_lambda_handler_upload_to_s3():
     """Test successful S3 upload scenario"""

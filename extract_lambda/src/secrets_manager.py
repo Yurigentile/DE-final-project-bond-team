@@ -15,7 +15,7 @@ def get_secret(name):
       String value of the secret or an informative error message.
 
     """
-    client = boto3.client("secretsmanager")
+    client = boto3.client("secretsmanager", region_name = 'eu-west-2')
     try:
         response = client.get_secret_value(SecretId=name)
         secret_value = response["SecretString"]
