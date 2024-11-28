@@ -16,7 +16,8 @@ class TestS3Functions(unittest.TestCase):
 
         # Mock bucket data
         timestamp = datetime.now().strftime("%Y-%m-%d")
-        def mock_list_objects_v2(Bucket, Prefix = timestamp):
+
+        def mock_list_objects_v2(Bucket, Prefix=timestamp):
             if Bucket == "test-bucket":
                 return {
                     "Contents": [
@@ -140,7 +141,9 @@ class TestLoadNewDataWithoutMoto(unittest.TestCase):
         self.assertIn("design", result)
         self.assertIn("sales_order", result)
 
-        mock_s3.list_objects_v2.assert_called_once_with(Bucket=bucket_name, Prefix = datetime.now().strftime("%Y-%m-%d"))
+        mock_s3.list_objects_v2.assert_called_once_with(
+            Bucket=bucket_name, Prefix=datetime.now().strftime("%Y-%m-%d")
+        )
         for key in mock_file_list:
             mock_s3.get_object.assert_any_call(Bucket=bucket_name, Key=key)
 
