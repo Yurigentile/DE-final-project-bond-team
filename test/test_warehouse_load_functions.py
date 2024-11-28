@@ -5,7 +5,7 @@ import unittest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
-from load_lambda.src.warehouse_load_functions import get_secret, alchemy_db_connection, alchemy_close_connection, load_data_into_warehouse
+from lambda_load.src.warehouse_load_functions import get_secret, alchemy_db_connection, alchemy_close_connection, load_data_into_warehouse
 
 @mock_aws
 class TestGetSecret(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestGetSecret(unittest.TestCase):
         result = get_secret(invalid_secret_name)
         self.assertIsNone(result, "Should return None for invalid JSON")
     
-    @patch("load_lambda.src.warehouse_load_functions.boto3.client")
+    @patch("lambda_load.src.warehouse_load_functions.boto3.client")
     def test_get_secret_client_error(self, mock_boto_client):
         # Test AWS ClientError        
         mock_client = mock_boto_client.return_value
@@ -53,7 +53,7 @@ class TestGetSecret(unittest.TestCase):
         result = get_secret("non-existent-secret")
         self.assertIsNone(result, "Should return None on ClientError")
 
-    @patch("load_lambda.src.warehouse_load_functions.boto3.client")
+    @patch("lambda_load.src.warehouse_load_functions.boto3.client")
     def test_get_secret_unexpected_error(self, mock_boto_client):
         mock_client = mock_boto_client.return_value
         mock_client.get_secret_value.side_effect = Exception("Unexpected error")
@@ -62,8 +62,8 @@ class TestGetSecret(unittest.TestCase):
         self.assertIsNone(result, "Should return None on unexpected error")
 
 class TestAlchemyDBConnection(unittest.TestCase):
-    @patch('load_lambda.src.warehouse_load_functions.get_secret')
-    @patch('load_lambda.src.warehouse_load_functions.create_engine')
+    @patch('lambda_load.src.warehouse_load_functions.get_secret')
+    @patch('lambda_load.src.warehouse_load_functions.create_engine')
     def test_alchemy_db_connection_success(self, mock_create_engine, mock_get_secret):
         # Mock the secret retrieval and database engine creation
         mock_get_secret.return_value = '{"username": "test_user", "password": "test_pass", "host": "localhost", "port": 5432, "dbname": "test_db"}'
@@ -79,7 +79,7 @@ class TestAlchemyDBConnection(unittest.TestCase):
         mock_engine.connect.assert_called_once()
         self.assertEqual(result, mock_engine)
 
-    @patch('load_lambda.src.warehouse_load_functions.get_secret')
+    @patch('lambda_load.src.warehouse_load_functions.get_secret')
     def test_alchemy_db_connection_no_secret(self, mock_get_secret):
         # Simulate get_secret returning None or empty string
         mock_get_secret.return_value = None
@@ -89,8 +89,8 @@ class TestAlchemyDBConnection(unittest.TestCase):
         
         self.assertTrue('Could not retrieve credentials' in str(context.exception))
 
-    @patch('load_lambda.src.warehouse_load_functions.get_secret')
-    @patch('load_lambda.src.warehouse_load_functions.create_engine')
+    @patch('lambda_load.src.warehouse_load_functions.get_secret')
+    @patch('lambda_load.src.warehouse_load_functions.create_engine')
     def test_alchemy_db_connection_failure(self, mock_create_engine, mock_get_secret):
         # Simulate failure in connection (engine.create throws an error)
         mock_get_secret.return_value = '{"username": "test_user", "password": "test_pass", "host": "localhost", "port": 5432, "dbname": "test_db"}'
@@ -107,7 +107,7 @@ class TestAlchemyCloseConnection(unittest.TestCase):
         self.mock_engine = MagicMock()
         self.logger = MagicMock()
     
-    @patch('load_lambda.src.warehouse_load_functions.logger')
+    @patch('lambda_load.src.warehouse_load_functions.logger')
     def test_close_connection_success(self, mock_logger):
         # Create a mock engine
         mock_engine = MagicMock()
@@ -129,7 +129,7 @@ class TestAlchemyCloseConnection(unittest.TestCase):
         # Since no engine is provided, we expect dispose() not to be called
         self.mock_engine.dispose.assert_not_called()
     
-    @patch('load_lambda.src.warehouse_load_functions.logger')
+    @patch('lambda_load.src.warehouse_load_functions.logger')
     def test_close_connection_exception(self, mock_logger):
         # Simulate an exception in dispose
         mock_engine = MagicMock()
@@ -142,8 +142,8 @@ class TestAlchemyCloseConnection(unittest.TestCase):
         mock_logger.error.assert_called_with("Error closing engine connection: Dispose failed")
 
 class TestLoadDataIntoWarehouse(unittest.TestCase):
-    @patch('load_lambda.src.warehouse_load_functions.alchemy_db_connection')
-    @patch('load_lambda.src.warehouse_load_functions.logger')
+    @patch('lambda_load.src.warehouse_load_functions.alchemy_db_connection')
+    @patch('lambda_load.src.warehouse_load_functions.logger')
     def test_load_data_into_warehouse_success(self, mock_logger, mock_db_connection):
         # Arrange
         db_params = {'host': 'localhost', 'user': 'user', 'password': 'password', 'database': 'test_db'}
@@ -169,8 +169,8 @@ class TestLoadDataIntoWarehouse(unittest.TestCase):
             mock_logger.info.assert_any_call("Loading table: table2 (Rows: 2)")
             mock_logger.info.assert_any_call("Successfully loaded table: table2")
 
-    @patch('load_lambda.src.warehouse_load_functions.alchemy_db_connection')
-    @patch('load_lambda.src.warehouse_load_functions.logger')
+    @patch('lambda_load.src.warehouse_load_functions.alchemy_db_connection')
+    @patch('lambda_load.src.warehouse_load_functions.logger')
     def test_load_data_into_warehouse_failure(self, mock_logger, mock_db_connection):
         # Arrange
         db_params = {'host': 'localhost', 'user': 'user', 'password': 'password', 'database': 'test_db'}

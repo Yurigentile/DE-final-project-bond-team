@@ -1,7 +1,7 @@
 #Installing dependencies in layer directory for dependency layer
 resource "null_resource" "install_layer_dependencies" {
   provisioner "local-exec" {
-    command = "pip install -r ${path.module}/../extract_layer/requirements.txt -t ${path.module}/../extract_layer/python/lib/python3.12/site-packages"
+    command = "pip install -r ${path.module}/../lambda_layer/requirements.txt -t ${path.module}/../lambda_layer/python/lib/python3.12/site-packages"
   }
   triggers = {
     trigger = timestamp()
@@ -12,14 +12,14 @@ resource "null_resource" "install_layer_dependencies" {
 data "archive_file" "lambda" {
   type             = "zip"
   output_file_mode = "0666"
-  source_dir      = "${path.module}/../extract_lambda"
+  source_dir      = "${path.module}/../lambda_extract"
   output_path      = "${path.module}/../extract_lambda.zip"
 }
 
 data "archive_file" "layer_dependencies" {
   type             = "zip"
   output_file_mode = "0666"
-  source_dir       = "${path.module}/../extract_layer"
+  source_dir       = "${path.module}/../lambda_layer"
   output_path      = "${path.module}/../dependencies.zip"
   depends_on = [
     null_resource.install_layer_dependencies
@@ -66,7 +66,7 @@ resource "aws_lambda_function" "extract_handler" {
 data "archive_file" "transform_lambda" {
   type             = "zip"
   output_file_mode = "0666"
-  source_dir      = "${path.module}/../transform_lambda"
+  source_dir      = "${path.module}/../lambda_transform"
   output_path      = "${path.module}/../transform_lambda.zip"
 }
 
@@ -100,7 +100,7 @@ resource "aws_lambda_function" "transform_handler" {
 data "archive_file" "load_lambda" {
   type             = "zip"
   output_file_mode = "0666"
-  source_dir      = "${path.module}/../load_lambda"
+  source_dir      = "${path.module}/../lambda_load"
   output_path      = "${path.module}/../load_lambda.zip"
 }
 

@@ -1,5 +1,5 @@
 import pandas as pd
-from transform_lambda.src.transform_star import (
+from lambda_transform.src.transform_star import (
     transform_counterparty,
     transform_design,
     transform_sales_order,

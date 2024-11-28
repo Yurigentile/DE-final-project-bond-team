@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import patch
-from load_lambda.src.load_parquet_data import read_parquet_data_to_dataframe
+from lambda_load.src.load_parquet_data import read_parquet_data_to_dataframe
 import pandas as pd
 
 
 class TestReadParquetToDF(unittest.TestCase):
-    @patch("load_lambda.src.load_parquet_data.retrive_list_of_files")
-    @patch("load_lambda.src.load_parquet_data.wr.s3.read_parquet")
+    @patch("lambda_load.src.load_parquet_data.retrive_list_of_files")
+    @patch("lambda_load.src.load_parquet_data.wr.s3.read_parquet")
     def test_load_new_data(self, mock_aws_wrangler, mock_retrieve_list):
 
         # mock dataframe 

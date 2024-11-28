@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from transform_lambda.transform_handler import lambda_handler
+from lambda_transform.transform_handler import lambda_handler
 import pandas as pd
 
 data_json = [
@@ -49,8 +49,8 @@ tables = [
 
 class TestTransformHandler(unittest.TestCase):
 
-    @patch('transform_lambda.transform_handler.load_new_data')
-    @patch('transform_lambda.transform_handler.convert_dictionary_to_dataframe')
+    @patch('lambda_transform.transform_handler.load_new_data')
+    @patch('lambda_transform.transform_handler.convert_dictionary_to_dataframe')
     def test_handler_calls_utility_functions(self, mock_convert_dictionary_to_dataframe, mock_load_new_data):
         
         # mock util functions
