@@ -11,5 +11,4 @@ extract_lambda.zip
 transform_lambda.zip
 load_lambda.zip
 extract_layer/python/lib/python3.12/site-packages
-.env.test
 .DS_Store
