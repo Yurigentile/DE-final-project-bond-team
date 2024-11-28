@@ -18,10 +18,10 @@ if os.environ.get("AWS_EXECUTION_ENV") is not None:
 
 else:
     # For local use
-    from transform_lambda.src.load_new_data import load_new_data
-    from transform_lambda.src.convert_to_dataframe import convert_dictionary_to_dataframe
-    from transform_lambda.src.df_to_parquet import convert_dataframe_to_parquet
-    from transform_lambda.src.transform_star import (
+    from lambda_transform.src.load_new_data import load_new_data
+    from lambda_transform.src.convert_to_dataframe import convert_dictionary_to_dataframe
+    from lambda_transform.src.df_to_parquet import convert_dataframe_to_parquet
+    from lambda_transform.src.transform_star import (
     transform_counterparty,
     transform_design,
     transform_sales_order,

@@ -1,6 +1,6 @@
-from extract_lambda.handler import lambda_handler
+from lambda_extract.handler import lambda_handler
 from unittest.mock import patch, Mock
-from extract_lambda.src.s3_helpers import retrieve_list_of_s3_files
+from lambda_extract.src.s3_helpers import retrieve_list_of_s3_files
 import boto3
 from datetime import datetime
 from decimal import Decimal

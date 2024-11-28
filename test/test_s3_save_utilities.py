@@ -2,7 +2,7 @@ import boto3
 import unittest
 from unittest.mock import patch, Mock
 import json
-from extract_lambda.src.s3_save_utilities import s3_save_as_json, s3_save_as_csv
+from lambda_extract.src.s3_save_utilities import s3_save_as_json, s3_save_as_csv
 from moto import mock_aws
 
 

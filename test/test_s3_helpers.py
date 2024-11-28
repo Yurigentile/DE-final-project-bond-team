@@ -1,4 +1,4 @@
-from extract_lambda.src.s3_helpers import (
+from lambda_extract.src.s3_helpers import (
     create_object_with_datetime_key as cod,
     retrieve_list_of_s3_files,
 )

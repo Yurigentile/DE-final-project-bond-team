@@ -1,5 +1,5 @@
-from transform_lambda.src.df_to_parquet import convert_dataframe_to_parquet
-from transform_lambda.src.convert_to_dataframe import convert_dictionary_to_dataframe
+from lambda_transform.src.df_to_parquet import convert_dataframe_to_parquet
+from lambda_transform.src.convert_to_dataframe import convert_dictionary_to_dataframe
 import pytest
 from unittest.mock import patch
 import unittest
@@ -46,7 +46,7 @@ test_dict = {'address': [],
 
 class TestDfToParuqet:
 
-    @patch('transform_lambda.src.df_to_parquet.wr.s3.to_parquet')
+    @patch('lambda_transform.src.df_to_parquet.wr.s3.to_parquet')
     def test_function_uploads_file_to_s3_bucket(self, mock_df_to_parquet):
         
         # mock aws wrangler
@@ -62,7 +62,7 @@ class TestDfToParuqet:
         mock_df_to_parquet.assert_called_once()
 
 class TestException(unittest.TestCase):
-    @patch('transform_lambda.src.df_to_parquet.wr.s3.to_parquet')
+    @patch('lambda_transform.src.df_to_parquet.wr.s3.to_parquet')
     @patch('builtins.print')
     def test_function_raises_exception_for_invalid_bucket(self, mock_print, mock_to_parquet):
 
@@ -77,7 +77,3 @@ class TestException(unittest.TestCase):
 
         # assertion
         mock_print.assert_any_call("Error processing payment: NoSuchBucket")
-
-
-
-        
