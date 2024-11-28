@@ -1,6 +1,6 @@
-#new secrets manager
-#connect to db
-#load dataframes as sql into warehouse
+# new secrets manager
+# connect to db
+# load dataframes as sql into warehouse
 import json
 import boto3
 import logging
@@ -10,49 +10,53 @@ from sqlalchemy import create_engine
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 def get_secret(name):
     """Gets a secret from AWS Secret Manager with CloudWatch logging.
-    
+
     Finds the given secret name in the Secret Manager and returns the
     value as a dictionary, logging key events and potential errors.
-    
+
     Args:
       name: secret name
-    
+
     Returns:
       Dictionary containing the secret or None if not found.
     """
-    secretsmanager_client = boto3.client("secretsmanager", region_name = 'eu-west-2')
-    
+    secretsmanager_client = boto3.client("secretsmanager", region_name="eu-west-2")
+
     try:
         logger.info(f"Retrieving: {name}")
-        
+
         response = secretsmanager_client.get_secret_value(SecretId=name)
         secret_string = response.get("SecretString")
-        
+
         if secret_string is None:
             logger.error(f"Secret '{name}' has no string value.")
             return None
-        
+
         secret_value = json.loads(secret_string)
         logger.info(f"Secret retrieved successfully: {name}")
         return secret_value
-    
+
     except json.JSONDecodeError as e:
         logger.error(f"Secret '{name}' could not be parsed as JSON: {str(e)}")
         return None
     except ClientError as e:
-        error_code = e.response['Error']['Code']
-        error_message = e.response['Error']['Message']
-        
-        logger.error(f"Error retrieving '{name}': "
-                     f"Code: {error_code}, "
-                     f"Message: {error_message}")
+        error_code = e.response["Error"]["Code"]
+        error_message = e.response["Error"]["Message"]
+
+        logger.error(
+            f"Error retrieving '{name}': "
+            f"Code: {error_code}, "
+            f"Message: {error_message}"
+        )
         return None
     except Exception as e:
         logger.error(f"Unexpected error retrieving '{name}': {str(e)}")
         return None
-    
+
+
 def alchemy_db_connection(name):
     """
     Establishes a connection to the PostgreSQL database using SQLAlchemy.
@@ -85,7 +89,9 @@ def alchemy_db_connection(name):
         engine = create_engine(conn_str)
 
         with engine.connect() as connection:
-            logger.info(f"Successfully established database connection to {db_params['host']}:{db_params['port']}/{db_params['dbname']}")
+            logger.info(
+                f"Successfully established database connection to {db_params['host']}:{db_params['port']}/{db_params['dbname']}"
+            )
 
         return engine
 
@@ -96,10 +102,11 @@ def alchemy_db_connection(name):
         logger.error(f"Unexpected error connecting to database: {e}", exc_info=True)
         raise
 
+
 def alchemy_close_connection(engine):
     """
     Properly closes the database engine and releases resources.
-    
+
     Parameters:
         engine (sqlalchemy.engine.base.Engine): The SQLAlchemy engine to close.
     """
@@ -110,7 +117,8 @@ def alchemy_close_connection(engine):
     except Exception as e:
         logger.error(f"Error closing engine connection: {e}")
 
-def load_data_into_warehouse(dataframes, db_params, schema='public'):
+
+def load_data_into_warehouse(dataframes, db_params, schema="public"):
     """
     Loads DataFrames into a data warehouse (e.g., PostgreSQL).
 
@@ -127,16 +135,12 @@ def load_data_into_warehouse(dataframes, db_params, schema='public'):
     for table, df in dataframes.items():
         try:
             logger.info(f"Loading table: {table} (Rows: {len(df)})")
-            
+
             df.to_sql(
-                name=table,
-                con=engine,
-                schema=schema,
-                if_exists='append',
-                index=False
+                name=table, con=engine, schema=schema, if_exists="append", index=False
             )
-            
+
             logger.info(f"Successfully loaded table: {table}")
-        
+
         except Exception as load_error:
-            logger.error(f"Failed to load table {table}: {load_error}") 
+            logger.error(f"Failed to load table {table}: {load_error}")

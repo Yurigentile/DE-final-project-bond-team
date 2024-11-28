@@ -3,19 +3,29 @@ import os
 
 if os.environ.get("AWS_EXECUTION_ENV") is not None:
     # For use in lambda function
-    from src.warehouse_load_functions import get_secret, alchemy_db_connection, alchemy_close_connection, load_data_into_warehouse
+    from src.warehouse_load_functions import (
+        get_secret,
+        alchemy_db_connection,
+        alchemy_close_connection,
+        load_data_into_warehouse,
+    )
     from src.load_parquet_data import read_parquet_data_to_dataframe
 
 else:
     # For local use
-    from lambda_load.src.warehouse_load_functions import get_secret, alchemy_db_connection, alchemy_close_connection, load_data_into_warehouse
+    from lambda_load.src.warehouse_load_functions import (
+        get_secret,
+        alchemy_db_connection,
+        alchemy_close_connection,
+        load_data_into_warehouse,
+    )
     from lambda_load.src.load_parquet_data import read_parquet_data_to_dataframe
 
 
 def lambda_handler(event, context):
     try:
         logger = logging.getLogger()
-        logger.setLevel(logging.INFO)   
+        logger.setLevel(logging.INFO)
 
         secret = event.get("secret")
         bucket = event.get("bucket")
