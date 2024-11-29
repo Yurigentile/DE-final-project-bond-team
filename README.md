@@ -16,6 +16,8 @@
 
 This Data Engineering Project demonstrates the integration of multiple technologies and techniques to design and build a robust data pipeline, using best practices in Python programming, SQL, database modeling and could-based infrastructure. The primary objective is to create a reliable platform that extracts data from a simulated operational database, processes and archives it in structured formats within an AWS-based data lake, and remodels it into a data warehouse for analytical purposes.
 
+![Project Diagram](./Project_Diagram.png)
+
 ## Features
 - Automating data ingestion from a source database into S3 buckets.
 - Transforming raw data into a star schema for storage in a data warehouse.
@@ -42,10 +44,10 @@ This Data Engineering Project demonstrates the integration of multiple technolog
 
 - Fork and clone the repo
 - Create your virtual environment
-- Install dependencies with pip install -r requirements.txt
+- Install dependencies with `pip install -r requirements.txt`
 - Configure AWS CLI if needed
-- To enable running of tests using the test database use the make all command in the terminal
-- Initialise terraform with terraform init in the terminal
+- To enable running of tests using the test database use the `make all` command in the terminal
+- Initialise terraform with `terraform init` in the terminal
 
 ## Usage
 
@@ -53,12 +55,12 @@ All deployment is handled by terraform with the pipeline starting its extraction
 
 ## Terraform
 
-- terraform init
-- terraform plan
-- terraform apply
+` terraform init `\
+` terraform plan `\
+` terraform apply `
 
-To destroy
-- terraform destroy
+To destroy\
+` terraform destroy `
 
 ## Github Actions
 
@@ -68,7 +70,7 @@ The project uses GitHub Actions for CI/CD. The workflows are defined in the .git
 
 ## Contact
 
-dascrew | ieuanapwilliams@gmail.com
-tischena | tischenko.anastasiia@lll.kpi.ua
-bengriffiths95 | bengriffiths95@gmail.com
+dascrew | ieuanapwilliams@gmail.com\
+tischena | tischenko.anastasiia@lll.kpi.ua\
+bengriffiths95 | bengriffiths95@gmail.com\
 odashka | darya.babicheva@gmail.com
