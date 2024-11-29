@@ -16,6 +16,8 @@
 
 This Data Engineering Project demonstrates the integration of multiple technologies and techniques to design and build a robust data pipeline, using best practices in Python programming, SQL, database modeling and could-based infrastructure. The primary objective is to create a reliable platform that extracts data from a simulated operational database, processes and archives it in structured formats within an AWS-based data lake, and remodels it into a data warehouse for analytical purposes.
 
+![Project Diagram](./Project_Diagram.png)
+
 ## Features
 - Automating data ingestion from a source database into S3 buckets.
 - Transforming raw data into a star schema for storage in a data warehouse.
