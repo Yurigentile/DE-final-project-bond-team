@@ -8,6 +8,7 @@ from pg8000.native import Connection
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 def get_secret(name):
     """Gets a secret from AWS Secret Manager.
 
@@ -29,6 +30,7 @@ def get_secret(name):
     except ClientError as e:
         print(f">>> Secret {name} was not found")
         return None
+
 
 def create_conn(sm_params):
     """
@@ -79,7 +81,8 @@ def close_conn(conn):
     """
     conn.close()
 
-def load_data_into_warehouse(dataframes, conn, schema='project_team_6'):
+
+def load_data_into_warehouse(dataframes, conn, schema="project_team_6"):
     """
     Loads DataFrames into a data warehouse (e.g., PostgreSQL) using pg8000.
 
@@ -108,9 +111,9 @@ def load_data_into_warehouse(dataframes, conn, schema='project_team_6'):
         try:
             logger.info(f"Upserting table: {table} (Rows: {len(df)})")
 
-            cols = ', '.join(f'"{col}"' for col in df.columns)
-            placeholders = ', '.join(f':{col}' for col in df.columns)
-            updates = ', '.join(f'"{col}" = EXCLUDED."{col}"' for col in df.columns)
+            cols = ", ".join(f'"{col}"' for col in df.columns)
+            placeholders = ", ".join(f":{col}" for col in df.columns)
+            updates = ", ".join(f'"{col}" = EXCLUDED."{col}"' for col in df.columns)
             query = f"""
                 INSERT INTO {schema}.{table} ({cols}) 
                 VALUES ({placeholders})
