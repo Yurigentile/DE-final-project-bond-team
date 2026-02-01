@@ -1,7 +1,11 @@
 import boto3
 import re
 import awswrangler as wr
+import logging
 from datetime import datetime
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def retrive_list_of_files(bucket):
@@ -71,20 +75,38 @@ def read_parquet_data_to_dataframe(bucket):
     ]
     try:
         object_list = retrive_list_of_files(bucket)
+        if not object_list:
+            logger.warning(f"No files found in bucket {bucket}")
+            return {}
+
         result = {}
         sorted_files_list = sorted(object_list)
         last_object_list = sorted_files_list[-1]
-        last_sync_timestamp = re.match(
-            r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/", last_object_list
-        ).group(1)
+
+        # Match timestamp format: YYYY-MM-DD HH:MM (produced by transform)
+        match = re.match(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/", last_object_list)
+        if not match:
+            logger.error(f"Could not parse timestamp from: {last_object_list}")
+            raise ValueError(f"Invalid S3 key format: {last_object_list}")
+
+        last_sync_timestamp = match.group(1)
+        logger.info(f"Loading parquet files from timestamp: {last_sync_timestamp}")
+
         for table in tables:
             try:
-                result[table] = wr.s3.read_parquet(
-                    path=[f"s3://{bucket}/{last_sync_timestamp}/{table}.parquet"]
-                )
-            except:
-                pass
+                path = f"s3://{bucket}/{last_sync_timestamp}/{table}.parquet"
+                logger.info(f"Reading parquet: {path}")
+                result[table] = wr.s3.read_parquet(path=[path])
+                logger.info(f"Loaded {table}: {len(result[table])} rows")
+            except Exception as parquet_error:
+                # Log warning but continue - not all tables may have new data
+                logger.warning(f"Could not load {table}.parquet: {parquet_error}")
+
+        if not result:
+            logger.error("No parquet files were loaded successfully")
+            raise RuntimeError("Failed to load any parquet files")
 
         return result
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error in read_parquet_data_to_dataframe: {e}")
+        raise

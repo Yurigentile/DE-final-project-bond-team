@@ -228,6 +228,7 @@ def test_transform_sales_order():
     expected_df = pd.DataFrame(
         [
             {
+                "sales_record_id": 1,
                 "sales_order_id": 1,
                 "created_date": pd.to_datetime("2022-11-3"),
                 "created_time": "14:20:52.186000",
@@ -244,6 +245,7 @@ def test_transform_sales_order():
                 "agreed_delivery_location_id": 8,
             },
             {
+                "sales_record_id": 2,
                 "sales_order_id": 2,
                 "created_date": pd.to_datetime("2022-11-3"),
                 "created_time": "14:20:52.188000",
@@ -261,8 +263,6 @@ def test_transform_sales_order():
             },
         ]
     )
-    expected_df.index.name = "sales_record_id"
-    expected_df.index = expected_df.index + 1
     transformed_df = transform_sales_order(input_df)
 
     pd.testing.assert_frame_equal(transformed_df, expected_df)

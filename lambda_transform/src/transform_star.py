@@ -14,7 +14,25 @@ def transform_sales_order(sales_order_df):
     """
     if sales_order_df.empty:
         print("transform_sales_order - The input dataframe is empty.")
-        return
+        return pd.DataFrame(
+            columns=[
+                "sales_record_id",
+                "sales_order_id",
+                "created_date",
+                "created_time",
+                "last_updated_date",
+                "last_updated_time",
+                "sales_staff_id",
+                "counterparty_id",
+                "units_sold",
+                "unit_price",
+                "currency_id",
+                "design_id",
+                "agreed_payment_date",
+                "agreed_delivery_date",
+                "agreed_delivery_location_id",
+            ]
+        )
 
     try:
         fact_sales_order = sales_order_df.copy()
@@ -60,12 +78,13 @@ def transform_sales_order(sales_order_df):
             "agreed_delivery_date"
         ].dt.date.astype("datetime64[ns]")
 
-        # Refactoring the index
-        fact_sales_order.index = fact_sales_order.index + 1
-        fact_sales_order.index.name = "sales_record_id"
+        # Create sales_record_id as a column (not index) for database loading
+        fact_sales_order = fact_sales_order.reset_index(drop=True)
+        fact_sales_order.insert(0, "sales_record_id", fact_sales_order.index + 1)
 
         fact_sales_order = fact_sales_order[
             [
+                "sales_record_id",
                 "sales_order_id",
                 "created_date",
                 "created_time",
@@ -104,12 +123,21 @@ def transform_counterparty(counterparty_df, address_df):
     Side Effects:
     - Outputs "The input dataframe is empty." message if input dataframe were an empty.
     """
-    if counterparty_df.empty:
+    if counterparty_df.empty or address_df.empty:
         print("transform_counterparty - The input dataframe is empty.")
-        return
-    if address_df.empty:
-        print("transform_counterparty - The input dataframe is empty.")
-        return
+        return pd.DataFrame(
+            columns=[
+                "counterparty_id",
+                "counterparty_legal_name",
+                "counterparty_legal_address_line_1",
+                "counterparty_legal_address_line_2",
+                "counterparty_legal_district",
+                "counterparty_legal_city",
+                "counterparty_legal_postal_code",
+                "counterparty_legal_country",
+                "counterparty_legal_phone_number",
+            ]
+        )
 
     try:
         dim_counterparty = counterparty_df.copy()
@@ -161,7 +189,9 @@ def transform_design(design_df):
     """
     if design_df.empty:
         print("transform_design - The input dataframe is empty.")
-        return
+        return pd.DataFrame(
+            columns=["design_id", "design_name", "file_location", "file_name"]
+        )
 
     try:
         dim_design = design_df.copy()
@@ -181,11 +211,18 @@ def transform_staff(staff_df, department_df):
     Returns:
         data (pandas dataframe): transformed data
     """
-    if staff_df.empty:
+    if staff_df.empty or department_df.empty:
         print("transform_staff - The input dataframe is empty.")
-    if department_df.empty:
-        print("transform_staff - The input dataframe is empty.")
-        return
+        return pd.DataFrame(
+            columns=[
+                "staff_id",
+                "first_name",
+                "last_name",
+                "department_name",
+                "location",
+                "email_address",
+            ]
+        )
 
     try:
         dim_staff = pd.merge(staff_df, department_df, on="department_id")
@@ -211,9 +248,20 @@ def transform_date(fact_sales_order_df):
     Returns:
         data (pandas dataframe): transformed data
     """
-    if fact_sales_order_df.empty:
+    if fact_sales_order_df is None or fact_sales_order_df.empty:
         print("transform_date - The input dataframe is empty.")
-        return
+        return pd.DataFrame(
+            columns=[
+                "date_id",
+                "year",
+                "month",
+                "day",
+                "day_of_week",
+                "day_name",
+                "month_name",
+                "quarter",
+            ]
+        )
 
     try:
         dim_date = pd.DataFrame()
@@ -255,7 +303,7 @@ def transform_currency(currency_df):
     RETURNS: transformed dataframe"""
     if currency_df.empty:
         print("transform_currency - The input dataframe is empty.")
-        return
+        return pd.DataFrame(columns=["currency_id", "currency_code", "currency_name"])
 
     try:
         dim_currency = currency_df.copy()
@@ -278,7 +326,18 @@ def transform_location(address_df):
     """
     if address_df.empty:
         print("transform_location - The input dataframe is empty.")
-        return
+        return pd.DataFrame(
+            columns=[
+                "location_id",
+                "address_line_1",
+                "address_line_2",
+                "district",
+                "city",
+                "postal_code",
+                "country",
+                "phone",
+            ]
+        )
 
     try:
         dim_location = address_df.copy()

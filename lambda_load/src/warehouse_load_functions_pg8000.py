@@ -82,7 +82,7 @@ def close_conn(conn):
     conn.close()
 
 
-def load_data_into_warehouse(dataframes, conn, schema="project_team_6"):
+def load_data_into_warehouse(dataframes, conn, schema="public"):
     """
     Loads DataFrames into a data warehouse (e.g., PostgreSQL) using pg8000.
 
